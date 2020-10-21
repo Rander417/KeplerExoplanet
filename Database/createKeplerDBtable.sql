@@ -1,4 +1,25 @@
--- Table: public.raw_kepler
+-- This is the schema definition for the Kepler Exoplant Project DB
+
+-- kepler_habitable - store data  about the Stellar object associated with Kepler Objects of Interest 
+-- DROP TABLE kepler_habitable 
+
+CREATE TABLE kepler_habitable (
+    kepid int   NOT NULL,
+    koi_smet double precision   ,
+    koi_smet_err1 double precision   ,
+    koi_smet_err2 double precision   ,
+    koi_smass double precision   ,
+    koi_smass_err1 double precision   ,
+    koi_smass_err2 double precision   --,
+    -- CONSTRAINT pk_kepler_habitable PRIMARY KEY (kepid)
+);
+
+-- select count(*) from kepler_habitable
+-- delete from kepler_habitable
+
+
+-- raw_kepler - Store information about Kepler Objects of Interest 
+-- kepid - use this key to join with the stellar data table
 
 -- DROP TABLE public.raw_kepler;
 
@@ -11,7 +32,7 @@ CREATE TABLE public.raw_kepler
     koi_disposition text COLLATE pg_catalog."default" NOT NULL,
     koi_pdisposition text COLLATE pg_catalog."default" NOT NULL,
     koi_score double precision,
-    koi_fpflag_n bigint,
+    koi_fpflag_nt bigint,
     koi_fpflag_ss bigint,
     koi_fpflag_co bigint,
     koi_fpflag_ec bigint,
@@ -54,7 +75,7 @@ CREATE TABLE public.raw_kepler
     ra double precision,
     "dec" double precision,
     koi_kepmag double precision,
-    CONSTRAINT pk_raw_kepler PRIMARY KEY (rowid)
+    CONSTRAINT pk_raw_kepler PRIMARY KEY (kepoi_name)
 )
 
 TABLESPACE pg_default;

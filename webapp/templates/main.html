@@ -1,44 +1,124 @@
 <!doctype html>
 <html>
-<style>
-form {
-    margin: auto;
-    width: 35%;
-}
-.result {
-    margin: auto;
-    width: 35%;
-    border: 1px solid #ccc;
-}
-</style>
 <head>
-    <title>Kepler Model</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keppler Web Application</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<form action="{{ url_for('main') }}" method="POST">
-    <fieldset>
-        <legend>Input values:</legend>
-        Input 1:
-        <input name="input_1" type="number" required>
-        <br>
-        <br> Input 2:
-        <input name="input_2" type="number" required>
-        <br>
-        <br> Input 3:
-        <input name="input_3" type="number" required>
-        <br>
-        <br>
-        <input type="submit">
-    </fieldset>
-</form>
-<br>
-<div class="result" align="center">
-    {% if result %}
-        {% for variable, value in original_input.items() %}
-            <b>{{ variable }}</b> : {{ value }}
-        {% endfor %}
-        <br>
-        <br> Predicted output:
-           <p style="font-size:50px">{{ result }}</p>
-    {% endif %}
-</div>
+<body class="bg-dark">
+    <div class="wrapper">
+        <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
+            <a class="navbar-brand">NASA Kepler Mission Predictions: finding if an object of interest is an exoplanet using Machine Learning</a>
+        </nav>
+        <div class="jumbotron">
+            <h1 class=display-1 style="color:yellow">To infinity and beyond!</h1>
+        </div>
+    </div>
+    <form action="{{ url_for('main') }}#afterform" method="POST">
+        <fieldset>
+            <legend><p style="font-size:50px">Input values:</p></legend>
+            Centroid Offset FPF:
+            <select  name="input_1">
+                <option value=0>0</option>
+                <option value=1>1</option>
+              </select>
+            <i class="material-icons" style="font-size:18px" title="The source of the signal is from a nearby star, as inferred by measuring the centroid location of the image both in and out of transit, or by the strength of the transit signal in the target's outer (halo) pixels as compared to the transit signal from the pixels in the optimal (or core) aperture.">info_outline</i>
+            <br> Not Transit-Like FPF:
+            <select  name="input_2">
+                <option value=0>0</option>
+                <option value=1>1</option>
+              </select>
+            <i class="material-icons" style="font-size:18px" title="A KOI whose light curve is not consistent with that of a transiting planet. This includes, but is not limited to, instrumental artifacts, non-eclipsing variable stars, and spurious (very low SNR) detections.">info_outline</i>
+            <br> Ephemeris Match Indicates Contamination FPF:
+            <select  name="input_3">
+                <option value=0>0</option>
+                <option value=1>1</option>
+            </select>
+            <i class="material-icons" style="font-size:18px" title="The KOI shares the same period and epoch as another object and is judged to be the result of flux contamination in the aperture or electronic crosstalk.">info_outline</i>
+            <br> Transit Depth [ppm]:
+            <input name="input_4" type="number" step="any" value=1517.5 required>
+            <i class="material-icons" style="font-size:18px" title="The fraction of stellar flux lost at the minimum of the planetary transit. Transit depths are typically computed from a best-fit model produced by a Mandel-Agol (2002) model fit to a multi-quarter Kepler light curve, assuming a linear orbital ephemeris.">info_outline</i>
+            <br> Stellar Eclipse FPF:
+            <select  name="input_5">
+                <option value=0>0</option>
+                <option value=1>1</option>
+            </select>
+            <i class="material-icons" style="font-size:18px" title="A KOI that is observed to have a significant secondary event, transit shape, or out-of-eclipse variability, which indicates that the transit-like event is most likely caused by an eclipsing binary. However, self-luminous, hot Jupiters with a visible secondary eclipse will also have this flag set, but with a disposition of PC.">info_outline</i>
+            <br>Transit Signal-to-Noise:
+            <input name="input_6" type="number" step="any" value=66.5 required>
+            <i class="material-icons" style="font-size:18px" title="Transit depth normalized by the mean uncertainty in the flux during the transits.">info_outline</i>
+            <br> Stellar Radius [Solar radii]:
+            <input name="input_7" type="number" step="any" value=0.972 required>
+            <i class="material-icons" style="font-size:18px" title="The photospheric radius of the star.">info_outline</i>
+            <br> Impact Parameter:
+            <input name="input_8" type="number" step="any" value=0.538 required>
+            <i class="material-icons" style="font-size:18px" title="The sky-projected distance between the center of the stellar disc and the center of the planet disc at conjunction, normalized by the stellar radius.">info_outline</i>
+            <br> Orbital Period [days]:
+            <input name="input_9" type="number" step="any" value=11.09432054 required>
+            <i class="material-icons" style="font-size:18px" title="The interval between consecutive planetary transits.">info_outline</i>
+            <br> Equilibrium Temperature [K]:
+            <input name="input_10" type="number" step="any" value=835 required>
+            <i class="material-icons" style="font-size:18px" title="Approximation for the temperature of the planet. The calculation of equilibrium temperature assumes: &#013; a) thermodynamic equilibrium between the incident stellar flux and the radiated heat from the planet &#013; b) a Bond albedo (the fraction of total power incident upon the planet scattered back into space) of 0.3 &#013; c) the planet and star are blackbodies &#013; d) the heat is evenly distributed between the day and night sides of the planet.">info_outline</i>
+            <br> Transit Duration [hrs]:
+            <input name="input_11" type="number" step="any" value=4.5945 required>
+            <i class="material-icons" style="font-size:18px" title="The duration of the observed transits. Duration is measured from first contact between the planet and star until last contact. Contact times are typically computed from a best-fit model produced by a Mandel-Agol (2002) model fit to a multi-quarter Kepler light curve, assuming a linear orbital ephemeris.">info_outline</i>
+            <br> Insolation Flux [Earth flux]:
+            <input name="input_12" type="number" step="any" value=114.81 required>
+            <i class="material-icons" style="font-size:18px" title="Insolation flux is another way to give the equilibrium temperature. It depends on the stellar parameters (specifically the stellar radius and temperature), and on the semi-major axis of the planet. It's given in units relative to those measured for the Earth from the Sun.">info_outline</i>
+            <br> Transit Epoch [BKJD]:
+            <input name="input_13" type="number" step="any" value=171.20116 required>
+            <i class="material-icons" style="font-size:18px" title="The time corresponding to the center of the first detected transit in Barycentric Julian Day (BJD) minus a constant offset of 2,454,833.0 days. The offset corresponds to 12:00 on Jan 1, 2009 UTC.">info_outline</i>
+            <br> Kepler-band [mag]:
+            <input name="input_14" type="number" step="any" value=15.714 required>
+            <i class="material-icons" style="font-size:18px" title="Kepler-band (mag).">info_outline</i>
+            <br> Stellar Surface Gravity [log10(cm/s**2)]:
+            <input name="input_15" type="number" step="any" value=4.486 required>
+            <i class="material-icons" style="font-size:18px" title="The base-10 logarithm of the acceleration due to gravity at the surface of the star.">info_outline</i>
+            <br> Stellar Effective Temperature [K]:
+            <input name="input_16" type="number" step="any" value=6046 required>
+            <i class="material-icons" style="font-size:18px" title="The photospheric temperature of the star.">info_outline</i>
+            <br> Planetary Radius [Earth radii]:
+            <input name="input_17" type="number" step="any" value=3.9 required>
+            <i class="material-icons" style="font-size:18px" title="The radius of the planet. Planetary radius is the product of the planet star radius ratio and the stellar radius.">info_outline</i>
+            <br>
+            <br>
+            <br> <b><u>Machine Learning model:</u></b>
+            <select  name="model">
+              <option value="Supervised ML logistic Regression">Supervised ML logistic Regression</option>
+              <option value="Gradient Boosted Tree">Gradient Boosted Tree</option>
+              <option value="Random Forest">Random Forest</option>
+              <option value="Neural Network">Neural Network</option>
+            </select>
+            <br>
+            <br>
+            <input type="submit" value="Let's predict!">
+        </fieldset>
+    </form>
+    <br>
+    <br>
+    <br>
+    <div class="result" align="center">
+        {% if result %}
+            {% for variable, value in original_input.items() %}
+                <b> {{ variable }}</b> : {{ value }} |
+            {% endfor %}
+            <br>
+            <br>
+            <a name="afterform"></a>
+            <h1 style="font-size:50px;color:red">{{ result }}</h1>
+            {% if probability != "" %}
+            <p style="font-size:20px"><i>(Neural Network prediction probability: {{ probability }})</i></p>
+            {% endif %}
+            <input type="image" src={{ image }} style="width: 600px">
+        {% endif %}
+    </div>
+</body>
 </html>

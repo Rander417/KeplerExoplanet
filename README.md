@@ -1,6 +1,7 @@
 # KeplerExoplanets
 
 ## Presentation
+[PDF](actual URL to navigate)
 
 ### Selected topic
 Exoplanet — searching for a new World beyond our solar system
@@ -12,17 +13,11 @@ Is Earth the only habitable planet in the universe? Scientists and researchers a
 * https://exoplanetarchive.ipac.caltech.edu/index.html
 * https://www.kaggle.com/nasa/kepler-exoplanet-search-results
 
-### Questions we hope to answer with the data
-* How many confirmed planets?
-* What type of planets consider as confirmed planets? 
-* Which confirmed planet is closest to Earth?
-* What are the characteristics of confirmed planets? 
-* Based on the characteristics, which confirmed planet is the most habitable? 
-* What are the most recent discovered confirmed planets? 
-* How often are exoplanets confirmed in the existing liteatures disconfirmed by measurement from Kepler?
-
-Google slides drafting:
-https://docs.google.com/presentation/d/1aQ9Man76uhiFXY43nu5pnqOB6zrk1MvBqSxHWUtZ_Y0/edit?usp=sharing
+### Questions we hope to answer
+* Is the Kepler Object of Interest an Exoplanet?
+* Does EDA reveal interesting groupings?
+* Is the exoplanet in the habitable zone?
+* Can future observers use our models?
 
 ## GitHub
 ### Communication protocols
@@ -90,17 +85,12 @@ We used the PG Admin console Import/Export tool to import the CSV files into the
 - Join raw_kepler KOI data to it's associated stellar object data using "kepid" as a foreign key
 - This is a one to many relationship, where any kepid star can have one or more related KOIs.
 
-ERD - ![see here](https://github.com/tom-jj-G/KeplerExoplanets/blob/main/Database/ERD.jpg)
+ERD - ![see here](images/github/ERD.jpg)
 
 - Data dictionary "Data Columns in Kepler Objects of Interest Table" is located here "https://exoplanetarchive.ipac.caltech.edu/docs/API_kepcandidate_columns.html#tce_info"
 
 
-## Dashboard
-Google slides drafting: https://docs.google.com/presentation/d/1aQ9Man76uhiFXY43nu5pnqOB6zrk1MvBqSxHWUtZ_Y0/edit?usp=sharing
-![](images/github/dashboardDraft.png)
-
-We are currently planning on using Tableau for the presentation & dashboard. The interactive elements will be the graphs shown.
-
+## Application
 Web application (work in progress) created to predict exoplanet prediction using various inputs and our trained/built models: https://kepler-groupa.herokuapp.com/
 
 ## Goldilocks Zone Analysis

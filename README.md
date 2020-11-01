@@ -1,7 +1,7 @@
 # KeplerExoplanets
 
 ## Presentation
-[PDF](actual URL to navigate)
+[PDF](https://github.com/Rander417/KeplerExoplanet/blob/main/Kepler_Analysis_Presentation.pdf)
 
 ### Selected topic
 Exoplanet — searching for a new World beyond our solar system
@@ -22,10 +22,10 @@ Is Earth the only habitable planet in the universe? Scientists and researchers a
 ## GitHub
 ### Communication protocols
 After each pull request (PR), the person in charge of the github repository will review the code and ask for team assistance if necessary.
-![review_process.png)](images/github/review_process.png)
+![review_process.png](images/github/review_process.png)
 
 After the PR has been accepted, the person who made the PR will merge her/his code to the main branch and alert the team that their own personal branch or sub-branch needs to be updated with the latest version of the main branch.
-![github_merge.png)](images/github/github_merge.png)
+![github_merge.png](images/github/github_merge.png)
 
 
 ## Machine Learning Model

@@ -2,6 +2,7 @@
 
 ## Presentation
 [PDF](https://github.com/Rander417/KeplerExoplanet/blob/main/Kepler_Analysis_Presentation.pdf)
+![github_merge.png](images/github/titleslide.png)
 
 ### Selected topic
 Exoplanet — searching for a new World beyond our solar system

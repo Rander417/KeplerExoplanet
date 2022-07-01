@@ -1,7 +1,6 @@
 # KeplerExoplanets
 
-## Presentation
-[PDF](https://github.com/Rander417/KeplerExoplanet/blob/main/Kepler_Analysis_Presentation.pdf)
+## Presentation - [PDF](https://github.com/Rander417/KeplerExoplanet/blob/main/Kepler_Analysis_Presentation.pdf)
 
 ![titleslide.png](images/github/titleslide.png)
 

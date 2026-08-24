@@ -54,6 +54,7 @@ Cowork (cloud) cannot run git against this folder (the mount forbids deleting lo
 * Claude Code may **commit and push to `refresh-2026` freely**: its own work and Cowork handoffs, in small logical commits with plain-English messages.
 * **Ask Rich before**: merging or pushing to `main`, creating or moving tags, force-pushing, rebasing shared history, or deleting branches.
 * Cowork never pushes (it cannot), and never asks Rich to relay pushes by hand when Claude Code can do it.
+* Commit identity: Rich Anderson <29640136+Rander417@users.noreply.github.com>; never the private address (GitHub blocks the push).
 
 ## Deliverable shape (agreed 2026-08-24)
 

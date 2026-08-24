@@ -21,24 +21,27 @@ Agreed 2026-08-24 (see [decision](Decisions/2026-08-24%20Restart,%20layout,%20an
 
 ## Phase 2 — Reproduce and scrutinize
 
-- [ ] Rewrite notebooks 02–05 on the package; plain-Markdown headers; run top-to-bottom on Python 3.12 (01 done)
+- [ ] Rewrite notebooks 02, 04, 05 on the package; plain-Markdown headers; run top-to-bottom on Python 3.12 (01 and 03 done)
 - [x] Reproduce the 2020 numbers — done inside the review: 83 / 90 / 90 are accuracy / weighted f1 (macro f1 0.77 / 0.87 / 0.87); every legacy pickle reproduces from the raw CSV
 - [x] Notebook-by-notebook review — done 2026-08-24 as a multi-agent workflow (59 findings, 56 confirmed by adversarial verifiers): [summary](Research%20Log/2026-08-24%20Phase%202%20review%20summary.md), per-notebook notes in the Research Log. Notebook 01 pre-review: [entry](Research%20Log/2026-08-24%20Notebook%2001%20pre-review.md)
 - [x] Redact the 2020 database password from the tracked archive notebook
 - [x] Claude Code: one-time history rewrite (purge password, noreply email), force-push, commit map saved — [decision](Decisions/2026-08-24%20History%20rewrite,%20HZ%20scope,%20clustering%20fate.md)
 - [x] Cowork: re-cloned and independently verified the purge (29 commits, 0 hits, private email absent)
 - [x] Rewrite notebook 01 per the review — done 2026-08-24: [research log](Research%20Log/2026-08-24%20Notebook%2001%20rewrite.md)
-- [ ] Reproduce 03's numbers as **macro f1 with per-class f1** (0.77 / 0.87 / 0.87 with flags) so the baseline is stated honestly before anything changes
+- [x] Reproduce 03's numbers as macro + per-class f1 and compare feature sets with 5-fold CV — done 2026-08-24: [research log](Research%20Log/2026-08-24%20Notebook%2003%20rewrite%20—%20honest%20baseline.md)
 - [x] Extract shared code: `data.py`, `preprocess.py`, `viz.py` with tests (2026-08-24)
-- [ ] Extract `models.py` (with notebook 03) and `habitable.py` (with notebook 05)
+- [x] Extract `models.py` (with notebook 03)
+- [ ] Extract `habitable.py` (with notebook 05)
 - [ ] Reconcile the "11 vs 12 habitable confirmed planets" discrepancy (README vs PDF/pickle)
 
 ## Phase 3 — Fresh data and honest models
 
 - [ ] `fetch_koi.py`: pull `cumulative` via the archive TAP service, save as `data/raw/cumulative_tap_YYYY-MM-DD.csv`
 - [ ] Two model variants: *with flags* and *physics-only*; calibrated comparison, leakage-free feature importance
-- [ ] Evaluation upgrade: macro + per-class f1 always; 5-fold stratified CV with error bars; hyperparameters chosen on validation folds, never the test set
-- [ ] Feature handling: log1p on heavy-tailed columns; missingness indicators + NaN-native `HistGradientBoostingClassifier` instead of `dropna`; provenance columns (RA/Dec, TCE delivery) only in the with-provenance variant
+- [x] Evaluation upgrade: macro + per-class f1 always; 5-fold stratified CV with error bars (done in notebook 03)
+- [ ] Hyperparameters chosen on validation folds, never the test set (Phase 3 models)
+- [x] log1p on heavy-tailed columns (`models.log1p_scaled`; LR macro f1 0.53 → 0.67 physics-only)
+- [ ] Missingness indicators + NaN-native `HistGradientBoostingClassifier` on all 9,564 rows; provenance columns only in the with-provenance variant
 - [ ] Clustering: rerun scaled, on all classes, report ARI/NMI — **decided: keep as a null-result notebook**
 - [ ] Decide on pandas 3 migration
 - [x] No external databases — connection notebook deleted, schema/ERD kept as history ([decision](Decisions/2026-08-24%20Column%20names,%20palette,%20no%20external%20databases.md))

@@ -25,6 +25,16 @@ CLASS_ORDER = ["CONFIRMED", "CANDIDATE", "FALSE POSITIVE"]
 # Extra categorical slots for anything beyond the three classes (still no blue).
 EXTRA_COLORS = ["#6b4c2a", "#c2452d", "#5a5a52", "#a86bb5"]
 
+# Feature sets are ordinal by how much of the answer they contain, so they get one
+# warm hue in three lightness steps (validated as an ordinal ramp): the honest set is
+# darkest.
+FEATURE_SET_COLORS = {
+    "legacy_2020": "#d9a066",
+    "with_flags": "#b86200",
+    "physics_only": "#5c3300",
+}
+NEUTRAL = "#5a5a52"
+
 SEQUENTIAL_CMAP = "YlOrBr"  # one warm hue, light -> dark, for magnitudes
 TEXT_PRIMARY = "#0b0b0b"
 TEXT_SECONDARY = "#52514e"

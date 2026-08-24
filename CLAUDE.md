@@ -15,7 +15,7 @@ data/raw/          source files as downloaded (tracked)      data/README.md = pr
 data/processed/    regenerable parquet (ignored)
 data/legacy/       2020 pickles, kept for regression checks
 notebooks/         01_cleaning_eda  02_clustering  03_sklearn_models  04_neural_net  05_habitable_zone
-src/kepler/        shared code: paths, data (load + column names), preprocess (clean, feature sets), viz (palette); models/habitable later
+src/kepler/        shared code: paths, data (load + column names), preprocess (clean, feature sets), models (2020 baselines, scoring, CV), viz (palette); habitable later
 models/            trained artifacts (ignored)
 notes/             Obsidian notes (the vault root is the repo root)
 reports/           figures/ and presentation/
@@ -29,7 +29,7 @@ archive/           2020 SQL schema + ERD (no credentials; the DB is retired for 
 * Run things inside it: `uv run jupyter lab`, `uv run python script.py`, `uv run ruff check src tests`, `uv run pytest`.
 * Python 3.12 is pinned in `.python-version`; uv downloads it if missing.
 * PyTorch is added in Phase 4 as an optional extra (`uv sync --extra nn`). Its CUDA index is unreachable from the Cowork sandboxes, so that step runs on Rich's machine.
-* Notebook 01 is rewritten on the package (2026-08-24). Notebooks 02–05 still contain 2020 paths (`./Resources/...`, `Pickles/...`) and will not run until their Phase 2 rewrite.
+* Notebooks 01 and 03 are rewritten on the package (2026-08-24). Notebooks 02, 04 and 05 still contain 2020 paths (`./Resources/...`, `Pickles/...`) and will not run until their Phase 2 rewrite.
 * No external databases: data lives in `data/raw/` (tracked) and `data/processed/` (regenerated); Phase 3 pulls from the archive's TAP service.
 
 ### First-time setup on a new machine (Claude Code does this; Rich watches)
@@ -37,7 +37,7 @@ archive/           2020 SQL schema + ERD (no credentials; the DB is retired for 
 1. Confirm `git --version` works and `git config user.name` / `user.email` are set.
 2. Install uv with the one-liner above, then open a new terminal so `uv` is on PATH.
 3. In the repo root: `uv sync --group dev` (downloads Python 3.12 the first time; a few minutes).
-4. `uv run pytest` — all tests must pass (11 as of 2026-08-24). `uv run ruff check src tests` must be clean.
+4. `uv run pytest` — all tests must pass (16 as of 2026-08-24). `uv run ruff check src tests` must be clean.
 5. VS Code: install the `ms-python.python` and `ms-toolsai.jupyter` extensions (`code --install-extension <id>`), open the repo folder, and pick `.venv\Scripts\python.exe` as the interpreter/kernel.
 6. Push whatever is unpushed on `refresh-2026` (see git autonomy below).
 

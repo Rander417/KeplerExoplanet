@@ -1,8 +1,14 @@
 # KeplerExoplanets
 
-## Presentation - [PDF](https://github.com/Rander417/KeplerExoplanet/blob/main/Kepler_Analysis_Presentation.pdf)
+> **2026 refresh in progress (branch `refresh-2026`).** The original 2020 bootcamp project is preserved at tag `v1-bootcamp-2020`.
+> New layout: `notebooks/` (01-05), `data/` (raw, processed, legacy pickles), `src/kepler/` (shared code), `notes/` (Obsidian vault at the repo root),
+> `reports/` (figures, presentation), `archive/` (Postgres/ERD, 2020 Flask app, keras-tuner summaries). Setup and conventions live in [`CLAUDE.md`](CLAUDE.md);
+> the plan lives in [`notes/Roadmap.md`](notes/Roadmap.md). Everything below this line is the 2020-2022 README, with only file paths updated.
 
-![titleslide.png](images/github/titleslide.png)
+
+## Presentation - [PDF](reports/presentation/Kepler_Analysis_Presentation.pdf)
+
+![titleslide.png](reports/figures/readme/titleslide.png)
 
 ### Selected topic
 Exoplanet — searching for a new World beyond our solar system
@@ -23,10 +29,10 @@ Is Earth the only habitable planet in the universe? Scientists and researchers a
 ## GitHub
 ### Communication protocols
 After each pull request (PR), the person in charge of the github repository will review the code and ask for team assistance if necessary.
-![review_process.png](images/github/review_process.png)
+![review_process.png](reports/figures/readme/review_process.png)
 
 After the PR has been accepted, the person who made the PR will merge her/his code to the main branch and alert the team that their own personal branch or sub-branch needs to be updated with the latest version of the main branch.
-![github_merge.png](images/github/github_merge.png)
+![github_merge.png](reports/figures/readme/github_merge.png)
 
 
 ## Machine Learning Model
@@ -75,8 +81,8 @@ The DB engine instance is called "kepler", with two tables
 - kepler_habitable is a populated with some data about the stellar object associated with the Kepler Object of Interest (KOI)
 
 Project DB artifiacts of note:
-- The DB & table definition SQL files are in the project Database folder.
-- The source CSV files are in the project Resources folder.
+- The DB & table definition SQL files are in `archive/database/` (moved in the 2026 refresh).
+- The source CSV files are in `data/raw/` (see `data/README.md` for provenance).
 
 We used the PG Admin console Import/Export tool to import the CSV files into the DB tables.
 
@@ -86,17 +92,17 @@ We used the PG Admin console Import/Export tool to import the CSV files into the
 - Join raw_kepler KOI data to it's associated stellar object data using "kepid" as a foreign key
 - This is a one to many relationship, where any kepid star can have one or more related KOIs.
 
-ERD - ![see here](images/github/ERD.jpg)
+ERD - ![see here](reports/figures/readme/ERD.jpg)
 
 - Data dictionary "Data Columns in Kepler Objects of Interest Table" is located here "https://exoplanetarchive.ipac.caltech.edu/docs/API_kepcandidate_columns.html#tce_info"
 
 
 ## Application
-Web application (work in progress) created to predict exoplanet prediction using various inputs and our trained/built models: https://kepler-groupa.herokuapp.com/
+Web application (2020, Flask) created to predict exoplanet prediction using various inputs and our trained/built models. It was hosted at https://kepler-groupa.herokuapp.com/, which now returns a 404 (checked 2026-08-24) since [Heroku removed its free plans in November 2022](https://help.heroku.com/RSBRUH58/removal-of-heroku-free-product-plans-faq). Code preserved in `archive/webapp_flask_2020/`; a replacement is planned for Phase 5 of the refresh.
 
 ## Goldilocks Zone Analysis
 Goldilocks zone, or habitable zone, is the range of orbits around a star/planet that a planetary surface condition can support water to remain liquid. The planets in habitable zone cannot be too large or too small, too cold or too hot, which have to satisfied the conditions for water to remain liquid and living organism to survive.  
-![complifezone.jpg)](images/habitable_zone/complifezone.jpg)
+![complifezone.jpg)](reports/figures/habitable_zone/complifezone.jpg)
 Fig. Goldilocks zone colored in green and presented in different solar systems. 
 
 In Goldilocks zone analysis, only confirmed candidate was included and evaluated based on habitable zone requirements. There are 2248 kepler exoplanets are confirm candidate. 30 planets met the requirement for orbital period[days]; 1304 planets are within the temperature range, 1085 planets with sufficient natural resources(metallicity); 2189 planets are super-earth like planets. However, only 11 kepler exoplanets satisfied all the habitable conditions to be consider as an exoplanet, which are Kepler-111 c, Kepler-849 b, Kepler-1085 b, Kepler-90 g, Kepler-1550 b, Kepler-1514 b, Kepler-1515 b, Kepler-1519 b, Kepler-1533 b, Kepler-1625 b, Kepler-1634 b. 

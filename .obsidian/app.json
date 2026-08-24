@@ -1,0 +1,7 @@
+{
+  "attachmentFolderPath": "notes/attachments",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "notes",
+  "useMarkdownLinks": true,
+  "alwaysUpdateLinks": true
+}

@@ -1,0 +1,16 @@
+# Normalize line endings in the repository (LF); each platform checks out natively.
+# This folder is edited from Windows (VS Code) and from Linux (Cowork / Claude Code),
+# so let git own the line-ending question.
+* text=auto
+
+# Never touch binary artifacts
+*.pkl   binary
+*.h5    binary
+*.joblib binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.jfif  binary
+*.pdf   binary
+*.pptx  binary
+*.parquet binary

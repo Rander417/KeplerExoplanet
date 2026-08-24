@@ -22,8 +22,13 @@ Agreed 2026-08-24 (see [decision](Decisions/2026-08-24%20Restart,%20layout,%20an
 ## Phase 2 — Reproduce and scrutinize
 
 - [ ] Repoint every notebook to `kepler.paths`; plain-Markdown headers; run top-to-bottom on Python 3.12
-- [ ] Reproduce the 2020 f1 scores (83 / 90 / 90 for LogReg / GBT / balanced RF; NN 84 deferred to Phase 4) and compare outputs against `data/legacy/` pickles
-- [ ] Notebook-by-notebook review for bugs, hidden assumptions, and copy-paste drift — multi-agent workflow (reviewer + adversarial verifier per notebook); every finding goes in the Research Log. Notebook 01 pre-review done: [entry](Research%20Log/2026-08-24%20Notebook%2001%20pre-review.md)
+- [x] Reproduce the 2020 numbers — done inside the review: 83 / 90 / 90 are accuracy / weighted f1 (macro f1 0.77 / 0.87 / 0.87); every legacy pickle reproduces from the raw CSV
+- [x] Notebook-by-notebook review — done 2026-08-24 as a multi-agent workflow (59 findings, 56 confirmed by adversarial verifiers): [summary](Research%20Log/2026-08-24%20Phase%202%20review%20summary.md), per-notebook notes in the Research Log. Notebook 01 pre-review: [entry](Research%20Log/2026-08-24%20Notebook%2001%20pre-review.md)
+- [x] Redact the 2020 database password from the tracked archive notebook
+- [ ] Claude Code: one-time history rewrite (purge password, noreply email), force-push, commit map saved — [decision](Decisions/2026-08-24%20History%20rewrite,%20HZ%20scope,%20clustering%20fate.md)
+- [ ] Cowork: re-clone after the rewrite
+- [ ] Rewrite notebook 01 per the review: single load path, no raw-cell graveyard, explicit label mapping, `koi_score` kept numeric + indicator, report the 619 dropped rows, tests asserting row counts and class labels
+- [ ] Reproduce 03's numbers as **macro f1 with per-class f1** (0.77 / 0.87 / 0.87 with flags) so the baseline is stated honestly before anything changes
 - [ ] Extract shared code into `src/kepler/` (`data.py`, `preprocess.py`, `features.py`, `habitable.py`) with tests
 - [ ] Reconcile the "11 vs 12 habitable confirmed planets" discrepancy (README vs PDF/pickle)
 
@@ -31,18 +36,23 @@ Agreed 2026-08-24 (see [decision](Decisions/2026-08-24%20Restart,%20layout,%20an
 
 - [ ] `fetch_koi.py`: pull `cumulative` via the archive TAP service, save as `data/raw/cumulative_tap_YYYY-MM-DD.csv`
 - [ ] Two model variants: *with flags* and *physics-only*; calibrated comparison, leakage-free feature importance
+- [ ] Evaluation upgrade: macro + per-class f1 always; 5-fold stratified CV with error bars; hyperparameters chosen on validation folds, never the test set
+- [ ] Feature handling: log1p on heavy-tailed columns; missingness indicators + NaN-native `HistGradientBoostingClassifier` instead of `dropna`; provenance columns (RA/Dec, TCE delivery) only in the with-provenance variant
+- [ ] Clustering: rerun scaled, on all classes, report ARI/NMI — **decided: keep as a null-result notebook**
 - [ ] Decide on pandas 3 migration
 - [ ] Retire Postgres/ERD formally (already in `archive/database/`)
 
 ## Phase 4 — Habitable zone done properly, and the neural net
 
 - [ ] Kopparapu-based insolation limits (conservative + optimistic) with stellar-temperature dependence; planet-radius ceiling; carry `_err1/_err2` columns
+- [x] Host-star scope **decided: all stars**, with a `sunlike_host` flag column (12 of the 13 small flat-HZ planets orbit stars cooler than 5,500 K)
+- [ ] Left join for stellar columns (or a single TAP pull); report join losses; drop metallicity as a criterion
 - [ ] Re-run on the live table; cross-check survivors against the archive's own listings
-- [ ] Rebuild the neural net in PyTorch (`uv sync --extra nn` on Rich's machine, CUDA index config added to `pyproject.toml`)
+- [ ] Rebuild the neural net in PyTorch (`uv sync --extra nn` on Rich's machine, CUDA index config added to `pyproject.toml`): validation split, early stopping, calibration check, scaler + column contract exported with the model
 
 ## Phase 5 — Ship
 
-- [ ] Streamlit app replacing the 2020 Flask/Heroku app; local `.cmd` launcher for Rich
+- [ ] Streamlit app replacing the 2020 Flask/Heroku app; local `.cmd` launcher for Rich; verdict must be a physics-only prediction with honest uncertainty, not a flag lookup
 - [ ] Public, click-from-GitHub deployment with nothing to download: Streamlit Community Cloud or stlite on GitHub Pages (see decision)
 - [ ] Rewrite README and refresh the presentation
 - [ ] Stretch: run the same pipeline on the TESS Objects of Interest (TOI) table

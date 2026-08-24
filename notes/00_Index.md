@@ -19,9 +19,11 @@ The vault root is the git repo, so code, data docs, and notes all link to each o
 ## Logs
 
 - **Decisions** — one note per non-obvious choice, newest first
+  - [2026-08-24 History rewrite, HZ scope, clustering fate](Decisions/2026-08-24%20History%20rewrite,%20HZ%20scope,%20clustering%20fate.md)
   - [2026-08-24 Tag team, git autonomy, and how the app ships](Decisions/2026-08-24%20Tag%20team,%20git%20autonomy,%20and%20how%20the%20app%20ships.md)
   - [2026-08-24 Restart, layout, and tooling](Decisions/2026-08-24%20Restart,%20layout,%20and%20tooling.md)
 - **Research Log** — findings with numbers, one note per session or experiment
+  - [2026-08-24 Phase 2 review summary](Research%20Log/2026-08-24%20Phase%202%20review%20summary.md) — start here; links to the five per-notebook review notes
   - [2026-08-24 Notebook 01 pre-review](Research%20Log/2026-08-24%20Notebook%2001%20pre-review.md)
   - [2026-08-24 Restart reconnaissance](Research%20Log/2026-08-24%20Restart%20reconnaissance.md)
 
@@ -29,9 +31,9 @@ The vault root is the git repo, so code, data docs, and notes all link to each o
 
 | # | Notebook | Purpose (2020) | Status |
 |---|---|---|---|
-| 01 | `notebooks/01_cleaning_eda.ipynb` | Load, rename, nulls, variance/correlation, feature selection | legacy paths |
-| 02 | `notebooks/02_clustering.ipynb` | Feature importance, k-means, PCA | legacy paths |
-| 03 | `notebooks/03_sklearn_models.ipynb` | Logistic regression, gradient-boosted trees, balanced random forest | legacy paths |
+| 01 | `notebooks/01_cleaning_eda.ipynb` | Load, rename, nulls, variance/correlation, feature selection | reviewed 2026-08-24; rewrite pending |
+| 02 | `notebooks/02_clustering.ipynb` | Feature importance, k-means, PCA | reviewed; null result, keep-or-retire decision pending |
+| 03 | `notebooks/03_sklearn_models.ipynb` | Logistic regression, gradient-boosted trees, balanced random forest | reviewed; rewrite pending |
 | 04 | `notebooks/04_neural_net.ipynb` | Keras deep net + keras-tuner search | to be rebuilt in PyTorch (Phase 4) |
 | 05 | `notebooks/05_habitable_zone.ipynb` | Box-filter "habitable" screen | to be replaced by insolation-based HZ (Phase 4) |
 

@@ -19,8 +19,10 @@ The vault root is the git repo, so code, data docs, and notes all link to each o
 ## Logs
 
 - **Decisions** — one note per non-obvious choice, newest first
+  - [2026-08-24 Tag team, git autonomy, and how the app ships](Decisions/2026-08-24%20Tag%20team,%20git%20autonomy,%20and%20how%20the%20app%20ships.md)
   - [2026-08-24 Restart, layout, and tooling](Decisions/2026-08-24%20Restart,%20layout,%20and%20tooling.md)
 - **Research Log** — findings with numbers, one note per session or experiment
+  - [2026-08-24 Notebook 01 pre-review](Research%20Log/2026-08-24%20Notebook%2001%20pre-review.md)
   - [2026-08-24 Restart reconnaissance](Research%20Log/2026-08-24%20Restart%20reconnaissance.md)
 
 ## Notebooks (Phase 2 will make these runnable again)

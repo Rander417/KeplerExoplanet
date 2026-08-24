@@ -26,10 +26,41 @@ archive/           2020 Postgres+ERD, Flask web app, keras-tuner summaries, requ
 
 * Install uv on Windows (once): `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"` — from the [uv installation docs](https://docs.astral.sh/uv/getting-started/installation/).
 * Create/refresh the environment: `uv sync --group dev` (reads `pyproject.toml` + `uv.lock`, installs `src/kepler` in editable mode).
-* Run things inside it: `uv run jupyter lab`, `uv run python script.py`, `uv run ruff check src`, `uv run pytest`.
+* Run things inside it: `uv run jupyter lab`, `uv run python script.py`, `uv run ruff check src tests`, `uv run pytest`.
 * Python 3.12 is pinned in `.python-version`; uv downloads it if missing.
 * PyTorch is added in Phase 4 as an optional extra (`uv sync --extra nn`). Its CUDA index is unreachable from the Cowork sandboxes, so that step runs on Rich's machine.
 * Legacy notebooks still contain 2020 paths (`./Resources/...`, `Pickles/...`). Phase 2 repoints them to `kepler.paths`; until then they will not run as-is.
+
+### First-time setup on a new machine (Claude Code does this; Rich watches)
+
+1. Confirm `git --version` works and `git config user.name` / `user.email` are set.
+2. Install uv with the one-liner above, then open a new terminal so `uv` is on PATH.
+3. In the repo root: `uv sync --group dev` (downloads Python 3.12 the first time; a few minutes).
+4. `uv run pytest` — 3 smoke tests must pass. `uv run ruff check src tests` must be clean.
+5. VS Code: install the `ms-python.python` and `ms-toolsai.jupyter` extensions (`code --install-extension <id>`), open the repo folder, and pick `.venv\Scripts\python.exe` as the interpreter/kernel.
+6. Push whatever is unpushed on `refresh-2026` (see git autonomy below).
+
+## Tag team: Cowork authors, Claude Code commits
+
+Cowork (cloud) cannot run git against this folder (the mount forbids deleting lock files) and has no GitHub credentials, so the two Claudes split the work:
+
+* **Cowork** does analysis, notebook and code authoring, and research notes in its own clone, then writes finished files directly into this folder. It leaves a **`.cowork-handoff.md`** at the repo root (gitignored) listing the changed files and a suggested commit message.
+* **Claude Code**, at the start of any session and whenever asked to sync: if `.cowork-handoff.md` exists, read it, review the listed changes (`git status`, `git diff`), commit with the suggested message (edit it if the diff says otherwise), delete `.cowork-handoff.md`, push (see autonomy), and note anything surprising in `notes/Research Log/`.
+* After a push, Cowork resyncs from GitHub. GitHub is the source of truth; Cowork's clone is scratch.
+* Both read this file and `notes/00_Index.md` at session start.
+
+### Git autonomy (agreed 2026-08-24)
+
+* Claude Code may **commit and push to `refresh-2026` freely**: its own work and Cowork handoffs, in small logical commits with plain-English messages.
+* **Ask Rich before**: merging or pushing to `main`, creating or moving tags, force-pushing, rebasing shared history, or deleting branches.
+* Cowork never pushes (it cannot), and never asks Rich to relay pushes by hand when Claude Code can do it.
+
+## Deliverable shape (agreed 2026-08-24)
+
+Rich runs the results, he does not build them. Every phase ends with something he can open without a terminal:
+
+* Locally: a double-click launcher (`.cmd`) that starts the Streamlit app in the browser via `uv run`.
+* Publicly: **a link from the GitHub README that anyone can click and use, with no download and nothing that trips SmartScreen or antivirus.** Unsigned `.exe` packaging is therefore out. Candidates, decided in Phase 5: Streamlit Community Cloud (free hosting of a public repo) or stlite (Streamlit running in the browser on Pyodide, hostable as static files on GitHub Pages). To keep the static option open, app code must stay pure-Python with Pyodide-available packages (pandas, numpy, scikit-learn are built in; plotly installs from PyPI at load; PyTorch is not available, so any neural-net demo needs exported weights or precomputed predictions).
 
 ## Science guardrails (read before modelling)
 
@@ -45,7 +76,7 @@ archive/           2020 Postgres+ERD, Flask web app, keras-tuner summaries, requ
 * **Never fabricate** data, results, numbers, or references. Mark any placeholder `[PLACEHOLDER]` in a way that cannot be missed. Cite factual and scientific claims with links and quotes.
 * Be clear when Rich, or the 2020 work, is off track — kindly and specifically.
 * Flag operations that will be heavy on tokens or runtime before starting them.
-* Git: work on `refresh-2026`; commit in small logical units with plain-English messages; **never push, force-push, or rewrite history without Rich saying so**.
+* Git: work on `refresh-2026` under the autonomy rules above; **never touch `main`, tags, or history without Rich saying so**.
 * Notebooks: plain Markdown headers (no HTML `<span>` styling), one purpose per notebook, load data through `kepler.paths`, write outputs to `data/processed/` or `models/`, save figures to `reports/figures/<topic>/`.
 * Charts: no blue except for natural subjects (sky, water, sapphire). Use a warm palette (ambers, greens, plums, greys) and set it once per notebook; matplotlib's default cycle starts with blue, so override it.
 * When a count is arbitrary (bullets, example rows, clusters to display), Rich prefers 5 or 7 over 6.

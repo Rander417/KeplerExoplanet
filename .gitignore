@@ -161,3 +161,6 @@ uv-cache/
 
 # Transient folder used to hand files between Cowork and this machine
 _to_delete/
+
+# Cowork -> Claude Code handoff note (see CLAUDE.md "Tag team")
+.cowork-handoff.md

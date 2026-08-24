@@ -15,11 +15,11 @@ data/raw/          source files as downloaded (tracked)      data/README.md = pr
 data/processed/    regenerable parquet (ignored)
 data/legacy/       2020 pickles, kept for regression checks
 notebooks/         01_cleaning_eda  02_clustering  03_sklearn_models  04_neural_net  05_habitable_zone
-src/kepler/        shared code (paths.py now; data/preprocess/features/models/habitable in Phase 2)
+src/kepler/        shared code: paths, data (load + column names), preprocess (clean, feature sets), viz (palette); models/habitable later
 models/            trained artifacts (ignored)
 notes/             Obsidian notes (the vault root is the repo root)
 reports/           figures/ and presentation/
-archive/           2020 Postgres+ERD, Flask web app, keras-tuner summaries, requirements_2020.txt
+archive/           2020 SQL schema + ERD (no credentials; the DB is retired for good), Flask web app, keras-tuner summaries, requirements_2020.txt
 ```
 
 ## Environment (uv)
@@ -29,14 +29,15 @@ archive/           2020 Postgres+ERD, Flask web app, keras-tuner summaries, requ
 * Run things inside it: `uv run jupyter lab`, `uv run python script.py`, `uv run ruff check src tests`, `uv run pytest`.
 * Python 3.12 is pinned in `.python-version`; uv downloads it if missing.
 * PyTorch is added in Phase 4 as an optional extra (`uv sync --extra nn`). Its CUDA index is unreachable from the Cowork sandboxes, so that step runs on Rich's machine.
-* Legacy notebooks still contain 2020 paths (`./Resources/...`, `Pickles/...`). Phase 2 repoints them to `kepler.paths`; until then they will not run as-is.
+* Notebook 01 is rewritten on the package (2026-08-24). Notebooks 02–05 still contain 2020 paths (`./Resources/...`, `Pickles/...`) and will not run until their Phase 2 rewrite.
+* No external databases: data lives in `data/raw/` (tracked) and `data/processed/` (regenerated); Phase 3 pulls from the archive's TAP service.
 
 ### First-time setup on a new machine (Claude Code does this; Rich watches)
 
 1. Confirm `git --version` works and `git config user.name` / `user.email` are set.
 2. Install uv with the one-liner above, then open a new terminal so `uv` is on PATH.
 3. In the repo root: `uv sync --group dev` (downloads Python 3.12 the first time; a few minutes).
-4. `uv run pytest` — 3 smoke tests must pass. `uv run ruff check src tests` must be clean.
+4. `uv run pytest` — all tests must pass (11 as of 2026-08-24). `uv run ruff check src tests` must be clean.
 5. VS Code: install the `ms-python.python` and `ms-toolsai.jupyter` extensions (`code --install-extension <id>`), open the repo folder, and pick `.venv\Scripts\python.exe` as the interpreter/kernel.
 6. Push whatever is unpushed on `refresh-2026` (see git autonomy below).
 
@@ -78,7 +79,7 @@ Rich runs the results, he does not build them. Every phase ends with something h
 * Be clear when Rich, or the 2020 work, is off track — kindly and specifically.
 * Flag operations that will be heavy on tokens or runtime before starting them.
 * Git: work on `refresh-2026` under the autonomy rules above; **never touch `main`, tags, or history without Rich saying so**.
-* Notebooks: plain Markdown headers (no HTML `<span>` styling), one purpose per notebook, load data through `kepler.paths`, write outputs to `data/processed/` or `models/`, save figures to `reports/figures/<topic>/`.
-* Charts: no blue except for natural subjects (sky, water, sapphire). Use a warm palette (ambers, greens, plums, greys) and set it once per notebook; matplotlib's default cycle starts with blue, so override it.
+* Notebooks: plain Markdown headers (no HTML `<span>` styling), one purpose per notebook, load data through `kepler.data` / `kepler.preprocess`, name the feature set used, write outputs to `data/processed/` or `models/`, save figures to `reports/figures/<topic>/`. Column names are the archive's (`koi_period`); `kepler.data.label()` gives readable labels for charts.
+* Charts: no blue except for natural subjects (sky, water, sapphire). Call `kepler.viz.apply_style()` once per notebook: CONFIRMED green `#1f7a1f` ●, CANDIDATE amber `#e08a00` ▲, FALSE POSITIVE plum `#8b1e5f` ■ (validated palette, see notes/Decisions); `YlOrBr` for magnitudes, `PRGn` for diverging, `#5a5a52` for neutral bars.
 * When a count is arbitrary (bullets, example rows, clusters to display), Rich prefers 5 or 7 over 6.
 * Record every non-obvious decision as a short note in `notes/Decisions/` (date, decision, why, alternatives). Record findings with numbers in `notes/Research Log/`.

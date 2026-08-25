@@ -24,6 +24,7 @@ The vault root is the git repo, so code, data docs, and notes all link to each o
   - [2026-08-24 Tag team, git autonomy, and how the app ships](Decisions/2026-08-24%20Tag%20team,%20git%20autonomy,%20and%20how%20the%20app%20ships.md)
   - [2026-08-24 Restart, layout, and tooling](Decisions/2026-08-24%20Restart,%20layout,%20and%20tooling.md)
 - **Research Log** — findings with numbers, one note per session or experiment
+  - [2026-08-24 Notebook 07 — models v2 and the live-data fetcher](Research%20Log/2026-08-24%20Notebook%2007%20—%20models%20v2%20and%20the%20live-data%20fetcher.md) — all rows, nested CV, calibration; physics-only ceiling ≈ 0.72
   - [2026-08-24 Notebook 05 rebuild — insolation habitable zone](Research%20Log/2026-08-24%20Notebook%2005%20rebuild%20—%20insolation%20habitable%20zone.md) — Kopparapu 2014 limits; 15 small confirmed planets in the conservative zone
   - [2026-08-24 Notebook 02 rewrite — clustering null result](Research%20Log/2026-08-24%20Notebook%2002%20rewrite%20—%20clustering%20null%20result.md) — scaled k-means on all classes; ARI ≈ 0
   - [2026-08-24 Notebook 03 rewrite — honest baseline](Research%20Log/2026-08-24%20Notebook%2003%20rewrite%20—%20honest%20baseline.md) — 2020 numbers reproduced and re-labelled; feature sets compared with CV
@@ -41,6 +42,9 @@ The vault root is the git repo, so code, data docs, and notes all link to each o
 | 03 | `notebooks/03_sklearn_models.ipynb` | 2020 baselines re-labelled; feature sets compared with 5-fold CV; log1p | ✅ rewritten 2026-08-24, runs clean |
 | 04 | `notebooks/04_neural_net.ipynb` | Keras deep net + keras-tuner search | to be rebuilt in PyTorch (Phase 4) |
 | 05 | `notebooks/05_habitable_zone.ipynb` | Insolation-based habitable zone (Kopparapu 2014), radius ceiling, 2020 comparison | ✅ rebuilt 2026-08-24, runs clean |
+| 07 | `notebooks/07_models_v2.ipynb` | All rows, NaN-native boosting, nested CV, calibration, permutation importance, saved model | ✅ new 2026-08-24, runs clean (≈ 7 min) |
+
+*There is no notebook 06: house rule.*
 
 ## Conventions for notes
 

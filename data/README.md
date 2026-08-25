@@ -31,7 +31,7 @@ The archive's Table Access Protocol service returns the current cumulative table
 https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+cumulative&format=csv
 ```
 
-Live pulls will be saved as `raw/cumulative_tap_YYYY-MM-DD.csv` so the pull date is never ambiguous. For reference, on 2026-08-24 the live table reported CONFIRMED 2,747 / CANDIDATE 1,978 / FALSE POSITIVE 4,839 (same 9,564 KOIs).
+Live pulls are made with `uv run python -m kepler.fetch` and saved as `raw/cumulative_tap_YYYY-MM-DD.csv` with a `.provenance.json` (URL, UTC timestamp, rows, columns, SHA-256, disposition counts), so the pull date is never ambiguous. `--counts` prints only the disposition counts; `--dry-run` prints the URL. For reference, on 2026-08-24 the live table reported CONFIRMED 2,747 / CANDIDATE 1,978 / FALSE POSITIVE 4,839 (same 9,564 KOIs).
 
 ## Column names in code
 

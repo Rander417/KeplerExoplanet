@@ -152,3 +152,137 @@ def cv_macro_f1(
     folds = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
     per_fold = cross_val_score(clone(pipeline), X, y, cv=folds, scoring="f1_macro")
     return float(per_fold.mean()), float(per_fold.std()), per_fold
+
+
+# ---------------------------------------------------------------------------
+# Phase 3: NaN-native gradient boosting on every row, tuned on validation folds
+# ---------------------------------------------------------------------------
+
+MISSING_SUFFIX = "_missing"
+
+
+def add_missing_indicators(X: pd.DataFrame, columns: list[str] | None = None) -> pd.DataFrame:
+    """Append ``<column>_missing`` (0/1) for every column that has any NaN.
+
+    The NaNs themselves stay in place: ``HistGradientBoostingClassifier`` routes
+    them natively, and the indicator lets the model use *that a value is missing*
+    as information (in this table, missingness tracks the label).
+    """
+    out = X.copy()
+    for c in columns or [c for c in X.columns if X[c].isna().any()]:
+        out[f"{c}{MISSING_SUFFIX}"] = X[c].isna().astype("int64")
+    return out
+
+
+def hgb_model(random_state: int = 0, **params):
+    """A histogram gradient-boosting classifier with sensible, NaN-friendly defaults."""
+    from sklearn.ensemble import HistGradientBoostingClassifier
+
+    defaults = {
+        "learning_rate": 0.1,
+        "max_iter": 500,
+        "early_stopping": True,
+        "validation_fraction": 0.15,
+        "n_iter_no_change": 25,
+        "class_weight": "balanced",
+        "random_state": random_state,
+    }
+    return HistGradientBoostingClassifier(**{**defaults, **params})
+
+
+HGB_GRID = {
+    "learning_rate": [0.05, 0.1],
+    "max_leaf_nodes": [15, 31, 63],
+    "min_samples_leaf": [20, 50],
+}
+
+
+@dataclass(frozen=True)
+class NestedCVResult:
+    """Outer-fold metrics, the parameters each outer fold chose, and out-of-fold probabilities."""
+
+    folds: pd.DataFrame
+    params: list[dict]
+    oof_proba: np.ndarray  # rows aligned with X, columns = class codes 0,1,2
+    oof_pred: np.ndarray
+
+    @property
+    def summary(self) -> pd.Series:
+        return self.folds.agg(["mean", "std"]).T.apply(
+            lambda r: f"{r['mean']:.3f} ± {r['std']:.3f}", axis=1
+        )
+
+
+def nested_cv(
+    estimator,
+    grid: dict,
+    X: pd.DataFrame,
+    y: pd.Series,
+    *,
+    outer_splits: int = 5,
+    inner_splits: int = 3,
+    random_state: int = 0,
+    scoring: str = "f1_macro",
+) -> NestedCVResult:
+    """Honest model selection: hyperparameters are chosen on inner folds of the
+    training data only; every reported number comes from the outer test folds.
+    """
+    from sklearn.metrics import log_loss
+    from sklearn.model_selection import GridSearchCV
+
+    outer = StratifiedKFold(n_splits=outer_splits, shuffle=True, random_state=random_state)
+    inner = StratifiedKFold(n_splits=inner_splits, shuffle=True, random_state=random_state)
+    labels = [CLASS_CODES[c] for c in CLASSES]
+    oof_proba = np.zeros((len(X), len(labels)))
+    rows, params = [], []
+    for fold, (tr, te) in enumerate(outer.split(X, y)):
+        search = GridSearchCV(clone(estimator), grid, cv=inner, scoring=scoring, n_jobs=-1)
+        search.fit(X.iloc[tr], y.iloc[tr])
+        proba = search.predict_proba(X.iloc[te])
+        oof_proba[te] = proba
+        pred = np.asarray(labels)[proba.argmax(axis=1)]
+        s = score(y.iloc[te], pred)
+        rows.append(
+            {
+                "fold": fold,
+                "f1_macro": s.f1_macro,
+                "balanced_accuracy": s.balanced_accuracy,
+                "accuracy": s.accuracy,
+                **{f"f1_{name}": v for name, v in s.f1_per_class.items()},
+                "log_loss": float(log_loss(y.iloc[te], proba, labels=labels)),
+            }
+        )
+        params.append(search.best_params_)
+    folds = pd.DataFrame(rows).set_index("fold")
+    oof_pred = np.asarray(labels)[oof_proba.argmax(axis=1)]
+    return NestedCVResult(folds=folds, params=params, oof_proba=oof_proba, oof_pred=oof_pred)
+
+
+def reliability_table(y: pd.Series, proba: np.ndarray, n_bins: int = 10) -> pd.DataFrame:
+    """One-vs-rest reliability points per class: predicted probability vs observed frequency."""
+    rows = []
+    edges = np.linspace(0, 1, n_bins + 1)
+    for code, name in enumerate(CLASSES):
+        p = proba[:, code]
+        hit = (y.to_numpy() == code).astype(float)
+        which = np.clip(np.digitize(p, edges) - 1, 0, n_bins - 1)
+        for b in range(n_bins):
+            m = which == b
+            if m.sum() == 0:
+                continue
+            rows.append(
+                {
+                    "class": name,
+                    "bin": b,
+                    "predicted": float(p[m].mean()),
+                    "observed": float(hit[m].mean()),
+                    "count": int(m.sum()),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def brier_multiclass(y: pd.Series, proba: np.ndarray) -> float:
+    """Mean squared error between one-hot truth and probabilities, averaged over classes."""
+    onehot = np.eye(proba.shape[1])[y.to_numpy()]
+    return float(((proba - onehot) ** 2).sum(axis=1).mean())

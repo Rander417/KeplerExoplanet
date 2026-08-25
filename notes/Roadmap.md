@@ -36,12 +36,14 @@ Agreed 2026-08-24 (see [decision](Decisions/2026-08-24%20Restart,%20layout,%20an
 
 ## Phase 3 — Fresh data and honest models
 
-- [ ] `fetch_koi.py`: pull `cumulative` via the archive TAP service, save as `data/raw/cumulative_tap_YYYY-MM-DD.csv`
-- [ ] Two model variants: *with flags* and *physics-only*; calibrated comparison, leakage-free feature importance
+- [x] `kepler.fetch` (CLI `uv run python -m kepler.fetch`): pulls `cumulative` via TAP, saves `data/raw/cumulative_tap_YYYY-MM-DD.csv` + provenance JSON (2026-08-24)
+- [ ] Claude Code: run the pull on Rich's machine and commit the CSV + provenance
+- [ ] Notebook 08: live vs snapshot — which KOIs changed class; habitable-zone screen and models re-run on the live table
+- [x] Two model variants with calibrated probabilities and leakage-free permutation importance — notebook 07 ([research log](Research%20Log/2026-08-24%20Notebook%2007%20—%20models%20v2%20and%20the%20live-data%20fetcher.md)): physics-only ceiling ≈ 0.72 macro f1
 - [x] Evaluation upgrade: macro + per-class f1 always; 5-fold stratified CV with error bars (done in notebook 03)
-- [ ] Hyperparameters chosen on validation folds, never the test set (Phase 3 models)
+- [x] Hyperparameters chosen on validation folds (nested CV) in notebook 07
 - [x] log1p on heavy-tailed columns (`models.log1p_scaled`; LR macro f1 0.53 → 0.67 physics-only)
-- [ ] Missingness indicators + NaN-native `HistGradientBoostingClassifier` on all 9,564 rows; provenance columns only in the with-provenance variant
+- [x] Missingness indicators + NaN-native `HistGradientBoostingClassifier` on all 9,564 rows (notebook 07); gain over dropna ≈ 0.007, i.e. none
 - [x] Clustering: rerun scaled, on all classes, ARI/NMI reported — null result recorded: [research log](Research%20Log/2026-08-24%20Notebook%2002%20rewrite%20—%20clustering%20null%20result.md)
 - [ ] Decide on pandas 3 migration
 - [x] No external databases — connection notebook deleted, schema/ERD kept as history ([decision](Decisions/2026-08-24%20Column%20names,%20palette,%20no%20external%20databases.md))

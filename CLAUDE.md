@@ -14,8 +14,8 @@ The plan, phase by phase, is in `notes/Roadmap.md`. Decisions are logged in `not
 data/raw/          source files as downloaded (tracked)      data/README.md = provenance + column dictionary
 data/processed/    regenerable parquet (ignored)
 data/legacy/       2020 pickles, kept for regression checks
-notebooks/         01_cleaning_eda  02_clustering  03_sklearn_models  04_neural_net  05_habitable_zone
-src/kepler/        shared code: paths, data (load + column names), preprocess (clean, feature sets), models (2020 baselines, scoring, CV), clustering (sweep + agreement), habitable (Kopparapu limits, screen), viz (palette)
+notebooks/         01_cleaning_eda  02_clustering  03_sklearn_models  04_neural_net  05_habitable_zone  07_models_v2  (no 06: house rule)
+src/kepler/        shared code: paths, data (load + column names), preprocess (clean, feature sets), models (2020 baselines, scoring, CV, NaN-native boosting, nested CV, calibration), clustering, habitable (Kopparapu limits, screen), fetch (live TAP pull), viz (palette)
 models/            trained artifacts (ignored)
 notes/             Obsidian notes (the vault root is the repo root)
 reports/           figures/<topic>/ (2020 figures kept under *_2020/), tables/, presentation/
@@ -29,15 +29,15 @@ archive/           2020 SQL schema + ERD (no credentials; the DB is retired for 
 * Run things inside it: `uv run jupyter lab`, `uv run python script.py`, `uv run ruff check src tests`, `uv run pytest`.
 * Python 3.12 is pinned in `.python-version`; uv downloads it if missing.
 * PyTorch is added in Phase 4 as an optional extra (`uv sync --extra nn`). Its CUDA index is unreachable from the Cowork sandboxes, so that step runs on Rich's machine.
-* Notebooks 01, 02, 03 and 05 are rewritten on the package (2026-08-24) and run top to bottom. Notebook 04 is the 2020 original (legacy paths) until its Phase 4 PyTorch rebuild.
-* No external databases: data lives in `data/raw/` (tracked) and `data/processed/` (regenerated); Phase 3 pulls from the archive's TAP service.
+* Notebooks 01, 02, 03, 05 and 07 run top to bottom on the package (2026-08-24; 07 takes about 7 minutes). Notebook 04 is the 2020 original (legacy paths) until its Phase 4 PyTorch rebuild.
+* No external databases: data lives in `data/raw/` (tracked) and `data/processed/` (regenerated). Live pulls: `uv run python -m kepler.fetch` (Rich's machine only; the sandbox cannot reach the archive) writes `data/raw/cumulative_tap_YYYY-MM-DD.csv` + a provenance JSON. Commit both.
 
 ### First-time setup on a new machine (Claude Code does this; Rich watches)
 
 1. Confirm `git --version` works and `git config user.name` / `user.email` are set.
 2. Install uv with the one-liner above, then open a new terminal so `uv` is on PATH.
 3. In the repo root: `uv sync --group dev` (downloads Python 3.12 the first time; a few minutes).
-4. `uv run pytest` — all tests must pass (24 as of 2026-08-24). `uv run ruff check src tests` must be clean.
+4. `uv run pytest` — all tests must pass (31 as of 2026-08-24). `uv run ruff check src tests` must be clean.
 5. VS Code: install the `ms-python.python` and `ms-toolsai.jupyter` extensions (`code --install-extension <id>`), open the repo folder, and pick `.venv\Scripts\python.exe` as the interpreter/kernel.
 6. Push whatever is unpushed on `refresh-2026` (see git autonomy below).
 

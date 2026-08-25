@@ -3,6 +3,10 @@
 # so let git own the line-ending question.
 * text=auto
 
+# Windows batch files must keep CRLF (cmd.exe mis-parses some LF-only scripts)
+*.cmd   text eol=crlf
+*.bat   text eol=crlf
+
 # Never touch binary artifacts
 *.pkl   binary
 *.h5    binary

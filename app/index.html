@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kepler KOI explorer</title>
+    <meta
+      name="description"
+      content="Kepler Objects of Interest: archive verdicts, a physics-only model, and the habitable-zone screen. Runs entirely in your browser."
+    />
+    <!-- stlite = Streamlit running in the browser on Pyodide (Python compiled to WebAssembly).
+         Nothing is installed on the visitor's machine and no server runs the app: the browser
+         downloads the Python runtime (~30 MB, cached afterwards), the app files listed below,
+         and the plotly package, then runs app/app.py locally. First load takes a minute. -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.css"
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #fcfcfb;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        color: #0b0b0b;
+      }
+      #note {
+        max-width: 42rem;
+        margin: 4rem auto;
+        padding: 0 1.5rem;
+        line-height: 1.5;
+      }
+      #note h1 {
+        font-size: 1.6rem;
+        margin-bottom: 0.5rem;
+      }
+      #note p {
+        color: #52514e;
+      }
+      #note a {
+        color: #8b1e5f;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div id="note">
+        <h1>🔭 Kepler KOI explorer</h1>
+        <p>
+          Starting Python inside your browser — the first visit downloads about 30 MB and takes
+          around a minute; later visits are faster. If nothing appears after a few minutes, the
+          repository README has a local option:
+          <a href="https://github.com/Rander417/KeplerExoplanet">github.com/Rander417/KeplerExoplanet</a>.
+        </p>
+      </div>
+    </div>
+    <script type="module">
+      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.js";
+
+      // Everything the app reads, at the same relative paths as in the repository. The
+      // GitHub Pages workflow (.github/workflows/pages.yml) copies exactly these files next
+      // to this page; app/build_site.py is the single list both use.
+      const APP_FILES = [
+        "app/app.py",
+        "app/data/koi_table.csv",
+        "app/data/summary.json",
+        "app/model/hgb_physics_only.json",
+        "src/kepler/__init__.py",
+        "src/kepler/paths.py",
+        "src/kepler/data.py",
+        "src/kepler/habitable.py",
+        "src/kepler/palette.py",
+        "src/kepler/portable.py",
+        "src/kepler/verdict.py",
+      ];
+      const files = {};
+      for (const path of APP_FILES) {
+        files[path] = { url: new URL(path, window.location.href).href };
+      }
+
+      // Optional overrides for local testing: ?pyodide=<url to pyodide.mjs>
+      const params = new URLSearchParams(window.location.search);
+      const options = {
+        entrypoint: "app/app.py",
+        files,
+        requirements: ["plotly"],
+        streamlitConfig: {
+          "theme.base": "light",
+          "theme.primaryColor": "#b86200",
+          "theme.backgroundColor": "#fcfcfb",
+          "theme.secondaryBackgroundColor": "#f3f1ea",
+          "theme.textColor": "#0b0b0b",
+          "theme.linkColor": "#8b1e5f",
+          "client.toolbarMode": "viewer",
+          "browser.gatherUsageStats": false,
+        },
+      };
+      if (params.get("pyodide")) {
+        options.pyodideUrl = params.get("pyodide");
+      }
+      mount(options, document.getElementById("root"));
+    </script>
+  </body>
+</html>

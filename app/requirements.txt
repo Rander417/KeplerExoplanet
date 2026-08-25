@@ -1,0 +1,7 @@
+# Streamlit Community Cloud reads this file (it sits next to the entrypoint app/app.py, so it
+# takes precedence over the repository-root uv.lock). The app needs no scikit-learn: the
+# model ships as plain numbers and is evaluated with numpy (see src/kepler/portable.py).
+streamlit>=1.49
+plotly>=5.22
+pandas>=2.2,<3
+numpy>=1.26

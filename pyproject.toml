@@ -25,6 +25,7 @@ dependencies = [
     "ipykernel>=6.29",
     "nbformat>=5.10",
     "nbconvert>=7.16",
+    "streamlit>=1.40",
 ]
 
 # PyTorch (Phase 4 neural-net rebuild) is deliberately NOT listed yet: the

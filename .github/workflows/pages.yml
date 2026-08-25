@@ -1,0 +1,48 @@
+# Publish the app to GitHub Pages as a static site: Streamlit running in the visitor's
+# browser via stlite (see app/index.html). Nothing is built server-side beyond copying files.
+#
+# One-time setup in the repository settings (Rich or Claude Code):
+#   Settings -> Pages -> "Build and deployment" -> Source: GitHub Actions
+#   Settings -> Environments -> github-pages -> Deployment branches: allow refresh-2026
+#   (by default only the repository's default branch may deploy to the github-pages environment)
+name: Deploy the app to GitHub Pages
+
+on:
+  push:
+    branches: [refresh-2026, main]
+    paths:
+      - "app/**"
+      - "src/kepler/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Assemble the static site
+        run: python3 app/build_site.py site
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

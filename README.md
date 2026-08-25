@@ -1,108 +1,72 @@
-# KeplerExoplanets
+# Kepler exoplanets — KOIs, honest models, and the habitable zone
 
-> **2026 refresh in progress (branch `refresh-2026`).** The original 2020 bootcamp project is preserved at tag `v1-bootcamp-2020`.
-> New layout: `notebooks/` (01-05), `data/` (raw, processed, legacy pickles), `src/kepler/` (shared code), `notes/` (Obsidian vault at the repo root),
-> `reports/` (figures, presentation), `archive/` (Postgres/ERD, 2020 Flask app, keras-tuner summaries). Setup and conventions live in [`CLAUDE.md`](CLAUDE.md);
-> the plan lives in [`notes/Roadmap.md`](notes/Roadmap.md). Everything below this line is the 2020-2022 README, with only file paths updated.
+Analysis of the NASA Exoplanet Archive's **Kepler Objects of Interest (KOI) cumulative table**: what the archive decided about 9,564 transit signals, how far the *physics alone* can predict those verdicts, and which confirmed planets sit in their star's habitable zone. Started as a 2020 Columbia Engineering data-analytics bootcamp project; restarted in 2026 with modern tooling and corrected science.
 
+## ▶ Run the app
 
-## Presentation - [PDF](reports/presentation/Kepler_Analysis_Presentation.pdf)
+**In your browser, nothing to install:** [PLACEHOLDER — the link goes live once GitHub Pages is enabled: `https://rander417.github.io/KeplerExoplanet/`]
 
-![titleslide.png](reports/figures/readme/titleslide.png)
+The app runs entirely on your machine — Python compiled to WebAssembly ([stlite](https://github.com/whitphx/stlite)) served as static files from this repository, so there is no server, no account, and nothing downloaded to disk. The first visit fetches about 30 MB and takes around a minute; later visits are faster.
 
-### Selected topic
-Exoplanet — searching for a new World beyond our solar system
+**On Windows, from a clone:** double-click `run_app.cmd` (needs [uv](https://docs.astral.sh/uv/); the first run builds the environment). Or, from any terminal: `uv run streamlit run app/app.py`.
 
-### Reason why the topic has been selected
-Is Earth the only habitable planet in the universe? Scientists and researchers are searching for planets that can provide similar living conditions for human, and those planets are called “exoplanet”. We want to investigate the exoplanet data provided by NASA Exoplanet Archive and find a habitable planet. 
+Five tabs: **Catalogue** (filter, plot, download), **KOI explorer** (one object, the model's calibrated probabilities, what-if sliders), **Habitable zone** (Kopparapu limits with the small confirmed planets and candidates), **Model & honesty** (leakage, calibration, the out-of-time test), **About** (provenance).
 
-### Description of the source of data
-* https://exoplanetarchive.ipac.caltech.edu/index.html
-* https://www.kaggle.com/nasa/kepler-exoplanet-search-results
+![The out-of-time test: the 2020-trained model's view of the 2020 candidates, split by what the archive decided later](reports/figures/live/out_of_time_candidates.png)
 
-### Questions we hope to answer
-* Is the Kepler Object of Interest an Exoplanet?
-* Does EDA reveal interesting groupings?
-* Is the exoplanet in the habitable zone?
-* Can future observers use our models?
+## What we found (2026 refresh)
 
-## GitHub
-### Communication protocols
-After each pull request (PR), the person in charge of the github repository will review the code and ask for team assistance if necessary.
-![review_process.png](reports/figures/readme/review_process.png)
+All numbers come from notebooks or scripts in this repository; the research log entries linked below hold the details.
 
-After the PR has been accepted, the person who made the PR will merge her/his code to the main branch and alert the team that their own personal branch or sub-branch needs to be updated with the latest version of the main branch.
-![github_merge.png](reports/figures/readme/github_merge.png)
+- **Target leakage settled by the data itself.** The four `koi_fpflag_*` vetting flags are written by the same process that produces the verdict. Between the 2020 snapshot and the live table pulled on 2026-08-25, **925 verdicts (9.7%) changed, and the flags were rewritten with them**. A model that uses the flags scores macro f1 **0.90** on today's labels; the same model on physics alone scores **0.747 ± 0.012** (5-fold CV). The flags "know" the answer; the physics has to earn it. — [notebook 08 log](notes/Research%20Log/2026-08-25%20Notebook%2008%20—%20live%20archive%20vs%20snapshot.md)
+- **Physics carries real, forward-looking signal.** The physics-only model trained on the **2020 labels only** rated the 2020 candidates that were *later confirmed* far more planet-like (median 0.95) than those *later dismissed* (median 0.26): **AUC 0.937** on verdicts it never saw. That is the honest answer to the 2020 question "can future observers use our models?".
+- **The 2020 numbers, re-labelled.** The "83 / 90 / 90 f1" of 2020 were accuracy and weighted f1; macro f1 was 0.77 / 0.87 / 0.87, and about 0.15 of it came from the flags. The physics-only ceiling is about 0.72–0.75 macro f1 in every construction we tried (tuned boosting, all rows, nested cross-validation). — [notebook 03 log](notes/Research%20Log/2026-08-24%20Notebook%2003%20rewrite%20—%20honest%20baseline.md), [notebook 07 log](notes/Research%20Log/2026-08-24%20Notebook%2007%20—%20models%20v2%20and%20the%20live-data%20fetcher.md)
+- **Habitable zone, done on insolation.** With the stellar-temperature-dependent limits of [Kopparapu et al. 2014](https://arxiv.org/abs/1404.5292) and the [Rogers 2015](https://arxiv.org/abs/1407.4457) rocky-radius ceiling, **16 confirmed planets ≤ 2 R⊕ sit in the conservative zone** on today's table (9 of them ≤ 1.6 R⊕), most of them around stars cooler than the Sun. The 2020 list (period, stellar temperature, radius and metallicity — never the planet's insolation) shares none of them. — [notebook 05 log](notes/Research%20Log/2026-08-24%20Notebook%2005%20rebuild%20—%20insolation%20habitable%20zone.md)
+- **Clustering is a null result.** Scaled k-means on the physics finds structure that does not track the verdicts (ARI ≤ 0.05), recorded as such. — [notebook 02 log](notes/Research%20Log/2026-08-24%20Notebook%2002%20rewrite%20—%20clustering%20null%20result.md)
 
+## How the app stays honest
 
-## Machine Learning Model
-We have updated our target value to be the "Exoplanet_Archive_Disposition" which is a categorical field with three options: False Positive, Candidate & Confirmed.
-- The prior target was binary-> Is it a planet or not: Disposition_Using_Kepler_Data. Models ran with this target achieved a 99% f1
-- Applying additional domain knowledge reveals that the Exoplanet_Archive_Disposition is the results of a broader and more recent NASA analysis and therefore a better target selection
+- Every KOI's probability in the catalogue is **out-of-fold**: it comes from a model that never saw that KOI's label.
+- The model is trained on **today's labels**, uses **twelve physical columns only** (no flags, no `koi_score`), and its probabilities are **calibrated** (isotonic maps fit on out-of-fold scores).
+- Labels are decided by an **explicit rule** shown in the app — `P(planet-like) = P(CANDIDATE) + P(CONFIRMED)`, threshold 0.5 — not a hidden argmax.
+- The trained model is exported as plain numbers (`app/model/hgb_physics_only.json`) and evaluated with numpy; a test proves the export reproduces scikit-learn's probabilities exactly. That is what lets the same model run in a browser.
+- `uv run python -m kepler.app_bundle` regenerates everything the app shows from the tracked data files.
 
-#### Based on the Dataset we will be evaluating the below (4) models.
-|Model name|Benefits|Limits|
-|---|--|--|
-|Supervised ML logistic Regression|- Easy to understand predictions| - Could struggle with high dimensional datasets and correlated features|
-|Gradient Boosted Tree|- High-performing<br> - Easy to understand predictions|- Sensitive to outliers|
-|Random Forest|- High-performing<br>- Robust against overfitting<br>- Fast to train|- Not easy to understand predictions|
-|Neural Net|- Handle extremely complex tasks|- Slow to train<br>- Almost impossible to understand predictions|
+## Repository layout
 
-Current f1 scores:<br>
-Supervised ML logistic Regression: 83%<br>
-Gradient Boosted Tree: 90%<br>
-Random Forest: 90%<br>
-Neural Net: 84%<br>
-*Note that our Neural Net has been updated to a deep model using the "relu" and "softmax" activations
+```
+app/          the Streamlit app, its data/model bundle, the stlite page for GitHub Pages
+data/raw/     the 2020 Kaggle snapshot and dated live pulls (with provenance JSON)  → data/README.md
+notebooks/    01 cleaning & EDA · 02 clustering · 03 baselines · 04 neural net (2020, to be rebuilt) ·
+              05 habitable zone · 07 models v2 · 08 live vs snapshot
+src/kepler/   the package: data, preprocess, models, clustering, habitable, fetch, portable, verdict, viz
+tests/        pytest suite (41 tests)
+notes/        Obsidian vault: roadmap, decisions, research log, glossary, references  → notes/00_Index.md
+reports/      figures and tables produced by the notebooks; the 2020 presentation
+archive/      the 2020 Flask app, database schema, keras-tuner output, and the 2020 README
+```
 
-#### EDA & Preprocessing
-Null Values
-- A large number of Null values (40k+)are present in the raw data. After preprocessing (including dropping unneeded columns) 3,572 remain
-- We are evaluating several methods for handling these: Dropping, Imputing (Mean, Median, Mode)
-- Further analysis shows that roughly 363 rows contain nulls. After evaluating (running the ML models) each impute method and applying domain knowledge the best options is to drop these rows
+Setup and working agreements: [`CLAUDE.md`](CLAUDE.md). Plan: [`notes/Roadmap.md`](notes/Roadmap.md).
 
-Feature Evaluation & Selection
-- We are primarily using a Sequential Feature Selector currently from the mlextend library. This performs an analysis on a range of possible features subset and scores them. Additionally we have a Correlation Matrix, Coefficient analysis and Feature Importance Graph to guide feature selection
-- Each Model has been trained on a subset of features. The results reveal that dropping features actually slightly reduces our percentage. We are currently running the models on all features instead.
+## Getting started
 
-Creating test & train datasets
-- Initially we set the targey(y) to koi_pdisposition and the features to the remaining columns based on the feature evaluation process
-- The training & testing set are split in default manner which works out to 75% train & 25% test
+```
+uv sync --group dev          # Python 3.12 + everything, from uv.lock
+uv run pytest                # 41 tests
+uv run jupyter lab           # the notebooks run top to bottom
+uv run python -m kepler.fetch          # a fresh pull of the KOI table (writes data/raw/cumulative_tap_<date>.csv)
+uv run python -m kepler.app_bundle     # rebuild the app's data and model from the latest pull
+```
 
-Scaling
-- The processed dataframe is scaled using ScikitLearns's standard scaler before the models are ran
+## Data and references
 
-## Database
-We are using the Postgres DB, currently an instance running in AWS on a free tier.
+- NASA Exoplanet Archive, [KOI cumulative table](https://exoplanetarchive.ipac.caltech.edu/docs/API_kepcandidate_columns.html) (column definitions), pulled via the [TAP service](https://exoplanetarchive.ipac.caltech.edu/docs/TAP/usingTAP.html) on 2026-08-25; the 2020-era [Kaggle snapshot](https://www.kaggle.com/nasa/kepler-exoplanet-search-results) is kept for reproducibility. Provenance and column dictionary: [`data/README.md`](data/README.md).
+- Kopparapu, R. K., et al. 2014, *ApJL* 787, L29 — [arXiv:1404.5292](https://arxiv.org/abs/1404.5292): habitable-zone insolation limits as a function of stellar effective temperature.
+- Rogers, L. A. 2015, *ApJ* 801, 41 — [arXiv:1407.4457](https://arxiv.org/abs/1407.4457): "the majority of 1.6 Earth-radius planets are too low density to be comprised of Fe and silicates alone".
+- Full list with notes: [`notes/References/References.md`](notes/References/References.md).
 
-The DB engine instance is called "kepler", with two tables
-- "raw_kepler" & "kepler_habitable"
-- raw_kepler is populated wth the CSV data file sourced from kaggle
-- kepler_habitable is a populated with some data about the stellar object associated with the Kepler Object of Interest (KOI)
+## Credits
 
-Project DB artifiacts of note:
-- The DB & table definition SQL files are in `archive/database/` (moved in the 2026 refresh).
-- The source CSV files are in `data/raw/` (see `data/README.md` for provenance).
+2020 team (Columbia Engineering data-analytics bootcamp): Rich Anderson (ML pipeline), Damien Corr, Priscilla Lin, Tom Greff. The original project is preserved at tag `v1-bootcamp-2020` and its README in [`archive/README_2020.md`](archive/README_2020.md). 2026 refresh: Rich Anderson with Claude (Cowork and Claude Code).
 
-We used the PG Admin console Import/Export tool to import the CSV files into the DB tables.
-
-### DB Schema
-- The column "kepoi_name" is the "raw_kepler" table's unique primary key, where each row represents one Kepler Object of Interest.
-- The column "kepid" is the "habitable_data" table's primary key, where each row repesents the stellar object associated with a KOI.
-- Join raw_kepler KOI data to it's associated stellar object data using "kepid" as a foreign key
-- This is a one to many relationship, where any kepid star can have one or more related KOIs.
-
-ERD - ![see here](reports/figures/readme/ERD.jpg)
-
-- Data dictionary "Data Columns in Kepler Objects of Interest Table" is located here "https://exoplanetarchive.ipac.caltech.edu/docs/API_kepcandidate_columns.html#tce_info"
-
-
-## Application
-Web application (2020, Flask) created to predict exoplanet prediction using various inputs and our trained/built models. It was hosted at https://kepler-groupa.herokuapp.com/, which now returns a 404 (checked 2026-08-24) since [Heroku removed its free plans in November 2022](https://help.heroku.com/RSBRUH58/removal-of-heroku-free-product-plans-faq). Code preserved in `archive/webapp_flask_2020/`; a replacement is planned for Phase 5 of the refresh.
-
-## Goldilocks Zone Analysis
-Goldilocks zone, or habitable zone, is the range of orbits around a star/planet that a planetary surface condition can support water to remain liquid. The planets in habitable zone cannot be too large or too small, too cold or too hot, which have to satisfied the conditions for water to remain liquid and living organism to survive.  
-![complifezone.jpg)](reports/figures/habitable_zone_2020/complifezone.jpg)
-Fig. Goldilocks zone colored in green and presented in different solar systems. 
-
-In Goldilocks zone analysis, only confirmed candidate was included and evaluated based on habitable zone requirements. There are 2248 kepler exoplanets are confirm candidate. 30 planets met the requirement for orbital period[days]; 1304 planets are within the temperature range, 1085 planets with sufficient natural resources(metallicity); 2189 planets are super-earth like planets. However, only 11 kepler exoplanets satisfied all the habitable conditions to be consider as an exoplanet, which are Kepler-111 c, Kepler-849 b, Kepler-1085 b, Kepler-90 g, Kepler-1550 b, Kepler-1514 b, Kepler-1515 b, Kepler-1519 b, Kepler-1533 b, Kepler-1625 b, Kepler-1634 b. 
+*This is an educational analysis of public data, not a product of NASA or the Exoplanet Archive. Verdicts are the archive's; probabilities are ours.*

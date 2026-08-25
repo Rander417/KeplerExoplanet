@@ -1,0 +1,15 @@
+# Streamlit theme for the local run and Community Cloud (stlite gets the same values
+# from app/index.html). House rule: no blue except for natural subjects.
+[theme]
+base = "light"
+primaryColor = "#b86200"
+backgroundColor = "#fcfcfb"
+secondaryBackgroundColor = "#f3f1ea"
+textColor = "#0b0b0b"
+linkColor = "#8b1e5f"
+
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true

@@ -164,3 +164,6 @@ _to_delete/
 
 # Cowork -> Claude Code handoff note (see CLAUDE.md "Tag team")
 .cowork-handoff.md
+
+# GitHub Pages build output (app/build_site.py; the workflow rebuilds it) - also matched by /site above
+/site/

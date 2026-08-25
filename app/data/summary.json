@@ -1,0 +1,324 @@
+{
+ "built_at_utc": "2026-08-25T20:30:20Z",
+ "quick": false,
+ "sources": {
+  "live": {
+   "file": "cumulative_tap_2026-08-25.csv",
+   "sha256": "37fffa141e05a4fba2a616ee8213631f8859e8770cd6137abfa5122f17c2ac5b",
+   "pulled_at_utc": "2026-08-25T18:30:33+00:00",
+   "source": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select%20*%20from%20cumulative&format=csv"
+  },
+  "snapshot": {
+   "file": "cumulative_kaggle_snapshot.csv",
+   "sha256": "b77f7332b7fe9fbc5ce4650b7d9f7aea035082ddd2b5701039eaadad2396db65"
+  }
+ },
+ "versions": {
+  "python": "3.12.3",
+  "scikit-learn": "1.9.0",
+  "pandas": "2.3.3",
+  "numpy": "2.5.2"
+ },
+ "table": {
+  "rows": 9564,
+  "columns": [
+   "kepid",
+   "kepler_name",
+   "koi_pdisposition",
+   "koi_score",
+   "ra",
+   "dec",
+   "koi_disposition",
+   "koi_disposition_2020",
+   "koi_period",
+   "koi_impact",
+   "koi_duration",
+   "koi_depth",
+   "koi_prad",
+   "koi_teq",
+   "koi_insol",
+   "koi_model_snr",
+   "koi_steff",
+   "koi_slogg",
+   "koi_srad",
+   "koi_kepmag",
+   "koi_prad_err1",
+   "koi_prad_err2",
+   "koi_insol_err1",
+   "koi_insol_err2",
+   "seff_recent_venus",
+   "seff_runaway_greenhouse",
+   "seff_maximum_greenhouse",
+   "seff_early_mars",
+   "teff_in_range",
+   "hz_conservative",
+   "hz_optimistic",
+   "hz_conservative_possible",
+   "rocky",
+   "super_earth",
+   "sunlike_host",
+   "grazing",
+   "p_candidate",
+   "p_confirmed",
+   "p_false_positive",
+   "p_planet_like",
+   "model_verdict",
+   "p_planet_like_2020model"
+  ]
+ },
+ "model": {
+  "name": "physics-only HistGradientBoosting, isotonic calibration (ensemble=False)",
+  "feature_set": "physics_only",
+  "n_iterations": 96,
+  "n_nodes": 17568,
+  "trained_on": {
+   "file": "cumulative_tap_2026-08-25.csv",
+   "sha256": "37fffa141e05a4fba2a616ee8213631f8859e8770cd6137abfa5122f17c2ac5b",
+   "rows": 9564
+  },
+  "labels": "koi_disposition",
+  "calibration": "isotonic on 5-fold out-of-fold decision scores",
+  "sklearn_version": "1.9.0",
+  "built_at_utc": "2026-08-25T20:30:20Z",
+  "quick": false,
+  "export_check_max_abs_diff_vs_sklearn": 0.0,
+  "params": {
+   "learning_rate": 0.05,
+   "max_leaf_nodes": 31,
+   "min_samples_leaf": 20
+  }
+ },
+ "metrics": {
+  "labels": "koi_disposition (live pull)",
+  "n_rows": 9564,
+  "class_counts": {
+   "CANDIDATE": 1977,
+   "CONFIRMED": 2748,
+   "FALSE POSITIVE": 4839
+  },
+  "cv_macro_f1_physics_only": {
+   "mean": 0.7470729682452703,
+   "std": 0.01176138865716093,
+   "folds": [
+    0.7635453134331351,
+    0.7453623844488853,
+    0.736062896016362,
+    0.7331736510678647,
+    0.7572205962601041
+   ]
+  },
+  "oof_macro_f1": {
+   "uncalibrated_argmax": 0.7470929341284457,
+   "calibrated_argmax": 0.7413780450258463,
+   "rule": 0.7441291067896293
+  },
+  "rule_per_class_f1": {
+   "CANDIDATE": 0.5468926553672316,
+   "CONFIRMED": 0.8414486224224571,
+   "FALSE POSITIVE": 0.8440460425791994
+  },
+  "rule_confusion": {
+   "rows": "true class",
+   "columns": "rule verdict",
+   "classes": [
+    "CANDIDATE",
+    "CONFIRMED",
+    "FALSE POSITIVE"
+   ],
+   "matrix": [
+    [
+     968,
+     305,
+     704
+    ],
+    [
+     189,
+     2428,
+     131
+    ],
+    [
+     406,
+     290,
+     4143
+    ]
+   ]
+  },
+  "calibration": {
+   "log_loss_uncalibrated": 0.5337456586681318,
+   "log_loss_calibrated": 0.5122057914921873,
+   "brier_uncalibrated": 0.3152131955961269,
+   "brier_calibrated": 0.2965405424081298,
+   "reliability_planet_like": [
+    {
+     "bin_low": 0.0,
+     "bin_high": 0.1,
+     "n": 2147,
+     "mean_predicted": 0.03890928382791631,
+     "observed": 0.021891010712622262
+    },
+    {
+     "bin_low": 0.1,
+     "bin_high": 0.2,
+     "n": 604,
+     "mean_predicted": 0.14640044988336998,
+     "observed": 0.10264900662251655
+    },
+    {
+     "bin_low": 0.2,
+     "bin_high": 0.30000000000000004,
+     "n": 538,
+     "mean_predicted": 0.2529072674985023,
+     "observed": 0.1970260223048327
+    },
+    {
+     "bin_low": 0.30000000000000004,
+     "bin_high": 0.4,
+     "n": 834,
+     "mean_predicted": 0.3499474567736165,
+     "observed": 0.3273381294964029
+    },
+    {
+     "bin_low": 0.4,
+     "bin_high": 0.5,
+     "n": 855,
+     "mean_predicted": 0.44743785149313553,
+     "observed": 0.4058479532163743
+    },
+    {
+     "bin_low": 0.5,
+     "bin_high": 0.6000000000000001,
+     "n": 501,
+     "mean_predicted": 0.5493768272797536,
+     "observed": 0.5449101796407185
+    },
+    {
+     "bin_low": 0.6000000000000001,
+     "bin_high": 0.7000000000000001,
+     "n": 532,
+     "mean_predicted": 0.6467380028629202,
+     "observed": 0.6898496240601504
+    },
+    {
+     "bin_low": 0.7000000000000001,
+     "bin_high": 0.8,
+     "n": 496,
+     "mean_predicted": 0.7517696987782853,
+     "observed": 0.7782258064516129
+    },
+    {
+     "bin_low": 0.8,
+     "bin_high": 0.9,
+     "n": 826,
+     "mean_predicted": 0.8557686641196461,
+     "observed": 0.87409200968523
+    },
+    {
+     "bin_low": 0.9,
+     "bin_high": 1.0,
+     "n": 2231,
+     "mean_predicted": 0.9512656650209287,
+     "observed": 0.9601075750784401
+    }
+   ],
+   "note": "Isotonic maps are fit on these same out-of-fold scores, so the calibrated numbers are mildly optimistic for the calibrator itself."
+  },
+  "planet_like": {
+   "auc": 0.9211584229108511,
+   "thresholds": [
+    {
+     "threshold": 0.3,
+     "precision": 0.7187250996015936,
+     "recall": 0.9544973544973545,
+     "f1": 0.82,
+     "n_planet_like": 6275
+    },
+    {
+     "threshold": 0.5,
+     "precision": 0.8482337549062364,
+     "recall": 0.8232804232804233,
+     "f1": 0.8355708302008377,
+     "n_planet_like": 4586
+    },
+    {
+     "threshold": 0.7,
+     "precision": 0.914719954967633,
+     "recall": 0.6878306878306878,
+     "f1": 0.7852138197632278,
+     "n_planet_like": 3553
+    },
+    {
+     "threshold": 0.9,
+     "precision": 0.9601075750784401,
+     "recall": 0.4533333333333333,
+     "f1": 0.6158711903392754,
+     "n_planet_like": 2231
+    }
+   ],
+   "default_threshold": 0.5
+  },
+  "cv_macro_f1_with_flags": {
+   "mean": 0.9012478796665009,
+   "std": 0.006865136471472059,
+   "folds": [
+    0.9026662812083698,
+    0.9057977941233681,
+    0.8927558131533787,
+    0.8942140615419393,
+    0.9108054483054483
+   ]
+  },
+  "out_of_time": {
+   "description": "Physics-only model trained on 2020 labels (out-of-fold) scored the 2020 CANDIDATEs; the archive decided some of them later.",
+   "cv_macro_f1_snapshot_labels": {
+    "mean": 0.7234318267735473,
+    "std": 0.006674896249114279
+   },
+   "n_candidates_2020": 2248,
+   "later": {
+    "CONFIRMED": 443,
+    "CANDIDATE": 1657,
+    "FALSE POSITIVE": 148
+   },
+   "median_p_planet_like": {
+    "CANDIDATE": 0.8257070668260746,
+    "CONFIRMED": 0.9460937414641997,
+    "FALSE POSITIVE": 0.2574323166858028
+   },
+   "auc_confirmed_vs_false_positive": 0.9368860960283081
+  }
+ },
+ "transitions": {
+  "rows": "2020 snapshot",
+  "columns": "live",
+  "classes": [
+   "CANDIDATE",
+   "CONFIRMED",
+   "FALSE POSITIVE"
+  ],
+  "matrix": [
+   [
+    1657,
+    443,
+    148
+   ],
+   [
+    0,
+    2292,
+    1
+   ],
+   [
+    320,
+    13,
+    4690
+   ]
+  ]
+ },
+ "habitable_zone": {
+  "confirmed_conservative_le_2": 16,
+  "confirmed_conservative_le_1_6": 9,
+  "confirmed_optimistic_le_2": 25,
+  "candidates_conservative_le_2": 65,
+  "candidates_optimistic_le_2": 82,
+  "teff_out_of_range": 605
+ }
+}

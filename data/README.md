@@ -23,6 +23,12 @@ Every dataset in this project traces back to the [NASA Exoplanet Archive](https:
 * **Origin:** a second pull of stellar metallicity and mass from the same archive table, joined on `kepid` for the habitable-zone analysis. These columns are part of the cumulative table itself, so a fresh TAP pull (below) makes this file unnecessary.
 * **Formerly:** `Resources/stellar_info_final.csv`.
 
+## `raw/cumulative_tap_2026-08-25.csv` (live pull)
+
+* **What:** the cumulative KOI table as served by the archive on 2026-08-25 18:30 UTC, 9,564 rows × 153 columns, SHA-256 in `cumulative_tap_2026-08-25.provenance.json`.
+* **Disposition counts:** CONFIRMED 2,748 / CANDIDATE 1,977 / FALSE POSITIVE 4,839.
+* **Relation to the snapshot:** same 9,564 KOIs; every physics column identical (`koi_depth` differs by rounding only); 925 dispositions changed; the four `koi_fpflag_*` columns and `koi_pdisposition` were updated for several hundred rows. Includes `koi_smet` / `koi_smass`, so `stellar_info_final.csv` is no longer needed.
+
 ## Live pulls (Phase 3)
 
 The archive's Table Access Protocol service returns the current cumulative table directly. Documentation: [Retrieving Exoplanet Archive Data With Table Access Protocol](https://exoplanetarchive.ipac.caltech.edu/docs/TAP/usingTAP.html). Example (CSV, all columns):
@@ -77,3 +83,13 @@ Columns ending in `_err1` / `_err2` are the upper and lower uncertainties of the
 ## A note on the two disposition columns ("the tale of two Ys")
 
 `koi_pdisposition` is what the Kepler pipeline's automated vetting concluded from Kepler data alone (CANDIDATE or FALSE POSITIVE). `koi_disposition` is the archive's current verdict, which adds follow-up work and confirmations (CANDIDATE, FALSE POSITIVE, or CONFIRMED). The four `koi_fpflag_*` columns are the reasons the vetting gave for a FALSE POSITIVE, which is why they nearly determine `koi_pdisposition`. See `notes/Decisions/` for how the refreshed models treat this.
+
+## The app's bundle (`app/data/`, `app/model/`)
+
+Derived files, tracked so the app can run without training anything. Regenerate with `uv run python -m kepler.app_bundle` (about 2.5 minutes) whenever a new live pull lands or the model recipe changes; `app/data/summary.json` records the source files' SHA-256, the library versions and the build time, and `tests/test_app.py` checks that the bundle matches the latest pull.
+
+| File | What it is |
+|---|---|
+| `app/data/koi_table.csv` | one row per KOI (9,564): identity, today's and the 2020 verdict, the 12 physics columns and 4 error columns, habitable-zone flags and per-KOI Kopparapu limits, out-of-fold calibrated probabilities from the live-label model, the rule's verdict, and the 2020-label model's P(planet-like) |
+| `app/data/summary.json` | provenance + every number the app quotes (cross-validation, rule metrics, calibration, out-of-time test, transitions, habitable-zone counts) |
+| `app/model/hgb_physics_only.json` | the fitted boosting model as plain numbers (trees + isotonic maps + column contract), evaluated by `kepler.portable` |

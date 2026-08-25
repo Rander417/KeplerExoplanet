@@ -39,3 +39,14 @@ def test_legacy_pickles_load():
         2285,
         4524,
     ]
+
+
+def test_live_pull_loads_and_matches_snapshot_index():
+    from kepler.data import load_kaggle_snapshot, load_tap_pull, tap_pulls
+
+    assert tap_pulls(), "no live pull committed"
+    live = load_tap_pull()
+    snap = load_kaggle_snapshot()
+    assert len(live) == 9564 and live.shape[1] >= 150
+    assert set(live.index) == set(snap.index)
+    assert set(snap.columns) - set(live.columns) == {"rowid"}

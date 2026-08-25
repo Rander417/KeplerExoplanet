@@ -132,3 +132,27 @@ def error_columns(df: pd.DataFrame) -> list[str]:
 def label(column: str) -> str:
     """Readable label for a column, falling back to the archive name."""
     return LABELS.get(column, column)
+
+
+def tap_pulls() -> list[Path]:
+    """Live pulls in data/raw, oldest first (named cumulative_tap_YYYY-MM-DD.csv)."""
+    return sorted(DATA_RAW.glob("cumulative_tap_*.csv"))
+
+
+def load_tap_pull(path: Path | None = None) -> pd.DataFrame:
+    """A live pull of the cumulative table (default: the most recent one), indexed by KOI name.
+
+    The live table has ~150 columns; the snapshot's 49 are a subset (only ``rowid``
+    is absent), so code written for the snapshot runs on it unchanged.
+    """
+    if path is None:
+        pulls = tap_pulls()
+        if not pulls:
+            raise FileNotFoundError(
+                "no data/raw/cumulative_tap_*.csv; run `python -m kepler.fetch`"
+            )
+        path = pulls[-1]
+    df = pd.read_csv(path).set_index(INDEX)
+    if not df.index.is_unique:
+        raise ValueError("kepoi_name is not unique in the live pull")
+    return df

@@ -35,3 +35,41 @@ TEXT_PRIMARY = "#0b0b0b"
 TEXT_SECONDARY = "#52514e"
 GRID = "#e6e4dd"
 SURFACE = "#fcfcfb"
+
+
+# --- Theme-aware sets for the app (plotly) -----------------------------------------------
+# Both validated with the dataviz palette checker on their own surface (2026-08-25):
+#   light: surface #fcfcfb, CVD separation 12.1, normal-vision 27.5 (amber needs labels: 2.6:1)
+#   dark:  surface #15140f, CVD separation 8.6, normal-vision 23.5, every colour >= 3:1
+# The dark set keeps the same three hues, re-stepped for the dark surface; marker shapes
+# (circle / triangle / square) remain the secondary encoding in both.
+THEMES = {
+    "light": {
+        "surface": SURFACE,
+        "surface_secondary": "#f3f1ea",
+        "text": TEXT_PRIMARY,
+        "text_secondary": TEXT_SECONDARY,
+        "grid": GRID,
+        "classes": dict(CLASS_COLORS),
+        "neutral": NEUTRAL,
+        "link": "#8b1e5f",
+        "primary": "#b86200",
+        "fill_optimistic": "rgba(224,138,0,0.12)",
+        "fill_conservative": "rgba(31,122,31,0.16)",
+        "sequential": "YlOrBr",
+    },
+    "dark": {
+        "surface": "#15140f",
+        "surface_secondary": "#23211a",
+        "text": "#f2f0e8",
+        "text_secondary": "#b8b4a6",
+        "grid": "#33302a",
+        "classes": {"CONFIRMED": "#1f7a1f", "CANDIDATE": "#cc8016", "FALSE POSITIVE": "#b8489a"},
+        "neutral": "#8a877c",
+        "link": "#e6a4d2",
+        "primary": "#e08a00",
+        "fill_optimistic": "rgba(204,128,22,0.22)",
+        "fill_conservative": "rgba(31,122,31,0.30)",
+        "sequential": "YlOrBr",
+    },
+}

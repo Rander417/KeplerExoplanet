@@ -14,6 +14,7 @@ status: accepted
 4. **The label rule lives in code** (`kepler.verdict`): `P(planet-like) = P(CANDIDATE) + P(CONFIRMED)`; below 0.5 the verdict is FALSE POSITIVE, otherwise the larger of CONFIRMED / CANDIDATE. The app shows the calibrated probabilities and the rule; the threshold is a slider.
 5. **Catalogue probabilities are out-of-fold**, from the live-label model; the what-if panel uses the full model and says so (its starting level is in-sample for that KOI; the change is what to read).
 6. **Browser-safe modules.** `kepler.palette` was split out of `kepler.viz` (which imports matplotlib) so the app can share the palette; `tests/test_app.py` imports every module that `index.html` mounts with scikit-learn, matplotlib, imbalanced-learn and scipy blocked.
+7. **Dark mode is a paired theme, not a toggle we maintain.** `[theme.light]` / `[theme.dark]` in `.streamlit/config.toml` (and the same keys in `app/index.html`) follow the visitor's system preference; the charts read `st.context.theme.type` and use `kepler.palette.THEMES`, whose dark set was validated on its own surface (2026-08-25). Streamlit's blue `st.info` callout is avoided (house rule).
 
 ## Context
 

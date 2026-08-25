@@ -1,12 +1,25 @@
-# Streamlit theme for the local run and Community Cloud (stlite gets the same values
-# from app/index.html). House rule: no blue except for natural subjects.
+# Streamlit theme for the local run and Community Cloud; app/index.html passes the same
+# values to the browser build. Light and dark variants follow the visitor's system setting
+# (or the app menu: three dots -> Settings -> Theme). House rule: no blue except natural subjects.
+# Colours validated with the dataviz palette checker (see notes/Decisions, 2026-08-25).
+
 [theme]
 base = "light"
+linkUnderline = true
+
+[theme.light]
 primaryColor = "#b86200"
 backgroundColor = "#fcfcfb"
 secondaryBackgroundColor = "#f3f1ea"
 textColor = "#0b0b0b"
 linkColor = "#8b1e5f"
+
+[theme.dark]
+primaryColor = "#e08a00"
+backgroundColor = "#15140f"
+secondaryBackgroundColor = "#23211a"
+textColor = "#f2f0e8"
+linkColor = "#e6a4d2"
 
 [browser]
 gatherUsageStats = false

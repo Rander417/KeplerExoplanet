@@ -31,28 +31,82 @@ if str(ROOT / "src") not in sys.path:  # run without installing the package
     sys.path.insert(0, str(ROOT / "src"))
 
 from kepler.habitable import TEFF_VALID, seff_limit
-from kepler.palette import CLASS_COLORS, GRID, NEUTRAL, SURFACE, TEXT_PRIMARY, TEXT_SECONDARY
+from kepler.palette import THEMES
 from kepler.portable import PortableHGB
 from kepler.verdict import CLASSES, PLANET_LIKE_THRESHOLD, verdict
 
 # --------------------------------------------------------------------------- setup
 st.set_page_config(page_title="Kepler KOI explorer", page_icon="🔭", layout="wide")
 
+
+def current_theme() -> dict:
+    """Colours for plotly that match the Streamlit theme in use (light or dark).
+
+    ``st.context.theme.type`` is inferred from the app background; it can be None
+    while the theme is changing, in which case the light set is used.
+    """
+    kind = None
+    try:
+        kind = st.context.theme.type
+    except Exception:  # noqa: BLE001 - older runtimes or no script context
+        kind = None
+    return THEMES.get(kind or "light", THEMES["light"])
+
+
+T = current_theme()
+CLASS_COLORS = T["classes"]
+
 CLASS_ORDER = ["CONFIRMED", "CANDIDATE", "FALSE POSITIVE"]
 SYMBOLS = {"CONFIRMED": "circle", "CANDIDATE": "triangle-up", "FALSE POSITIVE": "square"}
-PHYSICS = {
-    "koi_period": ("Orbital period", "days"),
-    "koi_impact": ("Impact parameter", ""),
-    "koi_duration": ("Transit duration", "hours"),
-    "koi_depth": ("Transit depth", "ppm"),
-    "koi_prad": ("Planet radius", "Earth radii"),
-    "koi_teq": ("Equilibrium temperature", "K"),
-    "koi_insol": ("Insolation", "Earth = 1"),
-    "koi_model_snr": ("Transit signal-to-noise", ""),
-    "koi_steff": ("Stellar temperature", "K"),
-    "koi_slogg": ("Stellar surface gravity", "log g"),
-    "koi_srad": ("Stellar radius", "Solar radii"),
-    "koi_kepmag": ("Kepler magnitude", "mag"),
+PHYSICS = {  # column: (label, unit, what it means in plain words)
+    "koi_period": ("Orbital period", "days", "How long one orbit takes: the time between dips."),
+    "koi_impact": (
+        "Impact parameter",
+        "",
+        "How central the crossing is: 0 = straight across the star's middle, near 1 = grazing the edge.",
+    ),
+    "koi_duration": (
+        "Transit duration",
+        "hours",
+        "How long each dip lasts, first contact to last.",
+    ),
+    "koi_depth": (
+        "Transit depth",
+        "ppm",
+        "How much starlight is blocked, in parts per million. Earth crossing the Sun: about 84 ppm.",
+    ),
+    "koi_prad": (
+        "Planet radius",
+        "Earth radii",
+        "The planet's size, from the depth and the star's size. Rocky worlds are mostly below 1.6.",
+    ),
+    "koi_teq": (
+        "Equilibrium temperature",
+        "K",
+        "A no-atmosphere estimate of the planet's temperature. Earth's is about 255 K.",
+    ),
+    "koi_insol": (
+        "Insolation",
+        "Earth = 1",
+        "Starlight received compared with Earth. The habitable-zone limits are set on this number.",
+    ),
+    "koi_model_snr": (
+        "Transit signal-to-noise",
+        "",
+        "How clearly the dip stands out from the noise. Higher is a cleaner detection.",
+    ),
+    "koi_steff": ("Stellar temperature", "K", "The star's surface temperature. The Sun: 5,772 K."),
+    "koi_slogg": (
+        "Stellar surface gravity",
+        "log g",
+        "Gravity at the star's surface (log scale). About 4.4 for the Sun; low values mean a giant.",
+    ),
+    "koi_srad": ("Stellar radius", "Solar radii", "The star's size compared with the Sun."),
+    "koi_kepmag": (
+        "Kepler magnitude",
+        "mag",
+        "The star's brightness in Kepler's band; bigger numbers are fainter stars.",
+    ),
 }
 WHAT_IF = [  # the sliders in the explorer (log scale where the data spans decades)
     ("koi_prad", True),
@@ -103,16 +157,19 @@ def load_model() -> PortableHGB:
 
 
 def style(fig: go.Figure, height: int = 420) -> go.Figure:
-    """House style for plotly: warm surface, recessive grid, title above a horizontal legend."""
+    """House style for plotly: warm surface, recessive grid, bold title above a horizontal legend."""
+    title = fig.layout.title.text if fig.layout.title and fig.layout.title.text else None
+    if title and not title.startswith("<b>"):
+        fig.update_layout(title_text=f"<b>{title}</b>")
     fig.update_layout(
         template="simple_white",
         height=height,
         margin={"l": 10, "r": 10, "t": 84, "b": 10},
-        paper_bgcolor=SURFACE,
-        plot_bgcolor=SURFACE,
-        font={"color": TEXT_PRIMARY, "size": 13},
+        paper_bgcolor=T["surface"],
+        plot_bgcolor=T["surface"],
+        font={"color": T["text"], "size": 13},
         title={
-            "font": {"size": 15, "color": TEXT_PRIMARY},
+            "font": {"size": 15, "color": T["text"]},
             "x": 0,
             "xanchor": "left",
             "y": 0.98,
@@ -126,10 +183,10 @@ def style(fig: go.Figure, height: int = 420) -> go.Figure:
             "x": 0,
             "title": None,
         },
-        hoverlabel={"bgcolor": "white", "font_color": TEXT_PRIMARY},
+        hoverlabel={"bgcolor": T["surface_secondary"], "font_color": T["text"]},
     )
-    fig.update_xaxes(gridcolor=GRID, showgrid=True, zeroline=False, linecolor=GRID)
-    fig.update_yaxes(gridcolor=GRID, showgrid=True, zeroline=False, linecolor=GRID)
+    fig.update_xaxes(gridcolor=T["grid"], showgrid=True, zeroline=False, linecolor=T["grid"])
+    fig.update_yaxes(gridcolor=T["grid"], showgrid=True, zeroline=False, linecolor=T["grid"])
     return fig
 
 
@@ -159,6 +216,28 @@ st.markdown(
     f"nothing is trained in the app. [Source and notebooks]({REPO})."
 )
 
+with st.expander("🧭 Start here if exoplanets are new to you (two minutes)", expanded=False):
+    st.markdown(
+        """
+- **What Kepler did.** NASA's Kepler space telescope (2009–2018) stared at about 150,000 stars and
+  watched for tiny, regular dips in brightness — the sign of a planet crossing in front of its star,
+  called a *transit*.
+- **What a KOI is.** A *Kepler Object of Interest* is one such repeating dip that looked promising
+  enough to track. The archive's table holds 9,564 of them; each has an id like `K00752.01`
+  (star number 752, first signal).
+- **The three verdicts.** NASA's Exoplanet Archive labels every KOI **CONFIRMED** (an established
+  planet, usually with a name like Kepler-227 b), **CANDIDATE** (still plausible, not yet settled),
+  or **FALSE POSITIVE** (something else: two stars eclipsing each other, a neighbour's light, noise).
+- **What our model does — and does not.** It looks only at the *physics* of the signal and the star
+  (period, depth, size, temperature…) and gives a probability for each verdict. It never sees the
+  archive's own vetting flags, which would amount to copying the answer. It is a test of how much
+  the measurements alone can tell you, not a replacement for the archive.
+- **How to read a probability.** "P(planet-like) = 80%" means that among KOIs the model rated like
+  this one, about 8 in 10 turned out to be planets (the *Model & honesty* tab shows that check).
+  Every probability in the catalogue comes from a model that never saw that KOI's answer.
+"""
+    )
+
 tab_cat, tab_koi, tab_hz, tab_model, tab_about = st.tabs(
     ["Catalogue", "KOI explorer", "Habitable zone", "Model & honesty", "About"]
 )
@@ -166,14 +245,32 @@ tab_cat, tab_koi, tab_hz, tab_model, tab_about = st.tabs(
 # --------------------------------------------------------------------------- 1 catalogue
 with tab_cat:
     st.subheader("Browse the KOIs")
+    st.caption(
+        "**How to read this tab.** Filter the 9,564 KOIs, then see them on a period-versus-size map: "
+        "each dot is one KOI, coloured by today's archive verdict; hover for its name and the model's "
+        "probability. The table lists the same rows and the download takes exactly what you filtered."
+    )
     f1, f2, f3, f4 = st.columns([2, 2, 2, 3])
     with f1:
-        classes = st.multiselect("Archive verdict (today)", CLASS_ORDER, default=CLASS_ORDER)
+        classes = st.multiselect(
+            "Archive verdict (today)",
+            CLASS_ORDER,
+            default=CLASS_ORDER,
+            help=(
+                "The archive's current verdict. CONFIRMED = an established planet; CANDIDATE = still "
+                "plausible, not yet settled; FALSE POSITIVE = not a planet (eclipsing stars, a neighbour's "
+                "light, noise)."
+            ),
+        )
     with f2:
         zone = st.selectbox(
             "Habitable zone",
             ["any", "conservative", "optimistic"],
-            help="Kopparapu et al. 2014 limits",
+            help=(
+                "Where liquid water could survive on a rocky surface, from Kopparapu et al. 2014. "
+                "Conservative = the safe band (runaway greenhouse to maximum greenhouse); optimistic = "
+                "the wider band (recent Venus to early Mars)."
+            ),
         )
     with f3:
         radius_max = st.select_slider(
@@ -181,10 +278,19 @@ with tab_cat:
             options=[1.0, 1.6, 2.0, 4.0, 10.0, 30.0, 1000.0],
             value=1000.0,
             format_func=lambda v: "no limit" if v == 1000.0 else f"≤ {v:g}",
+            help="Planet size in Earth radii. Below about 1.6 most planets are rocky; above 2 most are not.",
         )
     with f4:
-        changed_only = st.checkbox("Only KOIs whose verdict changed since 2020", value=False)
-        search = st.text_input("Find by KOI or Kepler name", placeholder="K00752.01, Kepler-452…")
+        changed_only = st.checkbox(
+            "Only KOIs whose verdict changed since 2020",
+            value=False,
+            help="The archive re-decided 925 of the 9,564 KOIs between the 2020 snapshot and today's table.",
+        )
+        search = st.text_input(
+            "Find by KOI or Kepler name",
+            placeholder="K00752.01, Kepler-452…",
+            help="Type part of a KOI id (K00752) or a planet name (Kepler-452).",
+        )
 
     view = table[table["koi_disposition"].isin(classes)]
     if zone == "conservative":
@@ -203,9 +309,13 @@ with tab_cat:
         view = view[hit]
 
     m1, m2, m3, m4 = st.columns(4)
-    m1.metric("KOIs shown", f"{len(view):,}")
+    m1.metric("KOIs shown", f"{len(view):,}", help="Rows left after the filters above.")
     for col, cls in zip((m2, m3, m4), CLASS_ORDER, strict=True):
-        col.metric(cls.title(), f"{int((view['koi_disposition'] == cls).sum()):,}")
+        col.metric(
+            cls.title(),
+            f"{int((view['koi_disposition'] == cls).sum()):,}",
+            help=f"KOIs shown whose archive verdict today is {cls}.",
+        )
 
     if len(view):
         plot = view.reset_index()
@@ -243,7 +353,9 @@ with tab_cat:
         fig.update_traces(marker={"size": 7, "line": {"width": 0}})
         fig.data = fig.data[::-1]  # draw the 4,800 false positives first so planets stay visible
         fig.update_layout(legend_traceorder="reversed")
-        st.plotly_chart(style(fig, 480), width="stretch")
+        fig.update_xaxes(dtick=1, minor_showgrid=False)  # one tick per decade on the log axes
+        fig.update_yaxes(dtick=1, minor_showgrid=False)
+        st.plotly_chart(style(fig, 480), width="stretch", theme=None)
 
         st.caption(
             "Probabilities are **out-of-fold**: the model that scored each KOI never saw its label. "
@@ -267,7 +379,9 @@ with tab_cat:
             "hz_optimistic",
         ]
         st.dataframe(
-            view[show_cols].rename(
+            view[show_cols]
+            .assign(kepler_name=view["kepler_name"].fillna("—"))
+            .rename(
                 columns={
                     "kepler_name": "Kepler name",
                     "koi_disposition": "verdict (today)",
@@ -298,11 +412,17 @@ with tab_cat:
             mime="text/csv",
         )
     else:
-        st.info("No KOIs match these filters.")
+        with st.container(border=True):
+            st.markdown("No KOIs match these filters.")
 
 # --------------------------------------------------------------------------- 2 explorer
 with tab_koi:
     st.subheader("One KOI, the model's view, and what-if sliders")
+    st.caption(
+        "**How to read this tab.** Pick one KOI to see its measurements, what the archive decided, what "
+        "the model thinks, and whether it sits in its star's habitable zone. The sliders at the bottom let "
+        "you change the physics and watch the probabilities respond."
+    )
     default = "K07016.01" if "K07016.01" in table.index else table.index[0]  # Kepler-452 b
     options = list(table.index)
     choice = st.selectbox(
@@ -310,6 +430,7 @@ with tab_koi:
         options,
         index=options.index(default),
         format_func=lambda k: table.at[k, "label"],
+        help="Entries read: KOI id · planet name (if confirmed) · today's archive verdict.",
     )
     row = table.loc[choice]
 
@@ -329,10 +450,20 @@ with tab_koi:
             {
                 "value": [row[c] for c in PHYSICS],
                 "unit": [PHYSICS[c][1] for c in PHYSICS],
+                "what it means": [PHYSICS[c][2] for c in PHYSICS],
             },
             index=[PHYSICS[c][0] for c in PHYSICS],
         )
-        st.dataframe(phys, width="stretch", height=460)
+        st.dataframe(
+            phys,
+            width="stretch",
+            height=460,
+            column_config={
+                "value": st.column_config.NumberColumn(width="small"),
+                "unit": st.column_config.TextColumn(width="small"),
+                "what it means": st.column_config.TextColumn(width="large"),
+            },
+        )
 
     with c2:
         st.markdown("#### The model's out-of-fold view (the honest number)")
@@ -353,9 +484,25 @@ with tab_koi:
         )
         oof_verdict = verdict(p_oof.to_frame().T[list(CLASSES)], thr)[0]
         k1, k2, k3 = st.columns(3)
-        k1.metric("P(planet-like)", pct(row["p_planet_like"]))
-        k2.metric("Rule verdict", oof_verdict)
-        k3.metric("Archive says", row["koi_disposition"])
+        k1.metric(
+            "P(planet-like)",
+            pct(row["p_planet_like"]),
+            help=(
+                "P(CANDIDATE) + P(CONFIRMED), calibrated: among KOIs the model rated like this one, "
+                "roughly this share turned out to be planets. Out-of-fold, so the model never saw this "
+                "KOI's verdict."
+            ),
+        )
+        k2.metric(
+            "Rule verdict",
+            oof_verdict,
+            help="Our explicit rule at the chosen threshold (spelled out on the Model & honesty tab).",
+        )
+        k3.metric(
+            "Archive says",
+            row["koi_disposition"],
+            help=f"NASA Exoplanet Archive verdict as of {pulled}.",
+        )
         bars = go.Figure(
             go.Bar(
                 x=[p_oof[c] for c in CLASS_ORDER],
@@ -370,7 +517,7 @@ with tab_koi:
         bars.update_layout(title="Calibrated probabilities (physics only)", xaxis_range=[0, 1.15])
         bars.update_xaxes(title="probability")
         bars.update_yaxes(autorange="reversed")
-        st.plotly_chart(style(bars, 260), width="stretch")
+        st.plotly_chart(style(bars, 260), width="stretch", theme=None)
 
         st.markdown("#### Habitable-zone check")
         if row["teff_in_range"]:
@@ -417,7 +564,7 @@ with tab_koi:
     edited = base.copy()
     slots = st.columns(4) + st.columns(3)
     for (col_name, is_log), widget in zip(WHAT_IF, slots, strict=True):
-        label, unit = PHYSICS[col_name]
+        label, unit, meaning = PHYSICS[col_name]
         value = row[col_name]
         title = f"{label} ({unit})" if unit else label
         with widget:
@@ -436,6 +583,7 @@ with tab_koi:
                 options=options,
                 value=float(value),
                 format_func=lambda x: f"{x:,.3g}",
+                help=meaning,
                 key=f"whatif_{choice}_{col_name}",
             )
             edited.at[choice, col_name] = picked
@@ -460,7 +608,7 @@ with tab_koi:
         name="catalogue values",
         x=CLASS_ORDER,
         y=[p_base[c] for c in CLASS_ORDER],
-        marker_color=NEUTRAL,
+        marker_color=T["neutral"],
         hovertemplate="%{x}: %{y:.3f}<extra>catalogue</extra>",
     )
     comp.add_bar(
@@ -473,7 +621,7 @@ with tab_koi:
     comp.update_layout(
         barmode="group", title="Calibrated probabilities before and after", yaxis_range=[0, 1]
     )
-    st.plotly_chart(style(comp, 300), width="stretch")
+    st.plotly_chart(style(comp, 300), width="stretch", theme=None)
 
     new_insol, teff = edited.at[choice, "koi_insol"], row["koi_steff"]
     if not pd.isna(new_insol) and not pd.isna(teff) and TEFF_VALID[0] <= teff <= TEFF_VALID[1]:
@@ -499,12 +647,34 @@ with tab_koi:
 # --------------------------------------------------------------------------- 3 habitable zone
 with tab_hz:
     st.subheader("Small planets in the habitable zone")
+    st.caption(
+        "**How to read this tab.** The habitable zone is the band of orbits where a rocky planet could keep "
+        "liquid water on its surface; hotter stars push it outward. It is drawn here in *insolation* "
+        "(starlight received, Earth = 1) against the star's temperature. The small confirmed planets and "
+        "candidates inside the band are the ones worth a second look."
+    )
     hz = summary["habitable_zone"]
     h1, h2, h3, h4 = st.columns(4)
-    h1.metric("Confirmed, conservative zone, ≤ 2 R⊕", hz["confirmed_conservative_le_2"])
-    h2.metric("…of which ≤ 1.6 R⊕ (plausibly rocky)", hz["confirmed_conservative_le_1_6"])
-    h3.metric("Confirmed, optimistic zone, ≤ 2 R⊕", hz["confirmed_optimistic_le_2"])
-    h4.metric("Candidates, conservative zone, ≤ 2 R⊕", hz["candidates_conservative_le_2"])
+    h1.metric(
+        "Confirmed, conservative zone, ≤ 2 R⊕",
+        hz["confirmed_conservative_le_2"],
+        help="Established planets no more than twice Earth's size inside the safe band of their star's zone.",
+    )
+    h2.metric(
+        "…of which ≤ 1.6 R⊕ (plausibly rocky)",
+        hz["confirmed_conservative_le_1_6"],
+        help="Below about 1.6 Earth radii most planets are dense enough to be rocky (Rogers 2015).",
+    )
+    h3.metric(
+        "Confirmed, optimistic zone, ≤ 2 R⊕",
+        hz["confirmed_optimistic_le_2"],
+        help="Same size cut, using the wider (recent Venus to early Mars) band.",
+    )
+    h4.metric(
+        "Candidates, conservative zone, ≤ 2 R⊕",
+        hz["candidates_conservative_le_2"],
+        help="Unsettled KOIs that would join the list if confirmed; sorted below by how planet-like the model finds them.",
+    )
     st.markdown(
         "The zone is defined on **insolation** (how much starlight the planet receives) with the "
         "stellar-temperature-dependent limits of "
@@ -523,8 +693,8 @@ with tab_hz:
     teff_grid = np.linspace(TEFF_VALID[0], TEFF_VALID[1], 120)
     fig = go.Figure()
     fills = [
-        ("recent_venus", "early_mars", "optimistic zone", "rgba(224,138,0,0.12)"),
-        ("runaway_greenhouse", "maximum_greenhouse", "conservative zone", "rgba(31,122,31,0.16)"),
+        ("recent_venus", "early_mars", "optimistic zone", T["fill_optimistic"]),
+        ("runaway_greenhouse", "maximum_greenhouse", "conservative zone", T["fill_conservative"]),
     ]
     for inner_lim, outer_lim, label, color in fills:
         inner = seff_limit(teff_grid, inner_lim)
@@ -535,7 +705,7 @@ with tab_hz:
                 y=np.concatenate([teff_grid, teff_grid[::-1]]),
                 fill="toself",
                 fillcolor=color,
-                line={"color": "rgba(0,0,0,0)"},
+                line={"width": 0},
                 name=label,
                 hoverinfo="skip",
             )
@@ -553,7 +723,7 @@ with tab_hz:
                     "color": CLASS_COLORS[cls],
                     "symbol": SYMBOLS[cls],
                     "size": 9,
-                    "line": {"color": "white", "width": 1},
+                    "line": {"color": T["surface"], "width": 1},
                 },
                 customdata=np.stack(
                     [sub["name"], sub["koi_prad"], sub["p_planet_like"], sub["koi_period"]], axis=1
@@ -570,7 +740,7 @@ with tab_hz:
             x=[1.0],
             y=[5772],
             mode="markers+text",
-            marker={"color": TEXT_SECONDARY, "symbol": "star", "size": 12},
+            marker={"color": T["text_secondary"], "symbol": "star", "size": 12},
             text=["Earth"],
             textposition="middle right",
             name="Earth (for scale)",
@@ -583,10 +753,12 @@ with tab_hz:
             "title": "Insolation (Earth = 1), hotter to the left",
             "type": "log",
             "autorange": "reversed",
+            "tickvals": [3, 2, 1.5, 1, 0.7, 0.5, 0.3, 0.2],
+            "ticktext": ["3", "2", "1.5", "1", "0.7", "0.5", "0.3", "0.2"],
         },
         yaxis={"title": "Host star temperature (K)"},
     )
-    st.plotly_chart(style(fig, 520), width="stretch")
+    st.plotly_chart(style(fig, 520), width="stretch", theme=None)
 
     st.markdown("#### Confirmed planets ≤ 2 R⊕ in the conservative zone")
     conf = table[
@@ -614,14 +786,23 @@ with tab_hz:
     st.dataframe(cand[list(cand_cols)].rename(columns=cand_cols), width="stretch", height=360)
     st.caption(
         "A KOI's insolation and host temperature come from the KOI table's own stellar parameters "
-        "(Kepler DR25). Discovery papers sometimes revise them: Kepler-1649 c, for example, is a "
-        "confirmed habitable-zone planet in the literature but sits outside the zone on the KOI "
-        "table's numbers."
+        "(Kepler DR25). Discovery papers sometimes revise them, and the Kepler-1649 system shows both "
+        "directions: Kepler-1649 c is a confirmed habitable-zone planet in the literature "
+        "([Vanderburg et al. 2020](https://arxiv.org/abs/2004.06725)) but sits outside the zone on the "
+        "table's numbers, while Kepler-1649 b tops this list on the same numbers although its discovery "
+        'paper describes it as an exo-Venus that "receives incident flux at a level similar to that of '
+        'Venus" ([Angelo et al. 2017](https://arxiv.org/abs/1704.03136)). Treat the lists as a screen, '
+        "not a verdict."
     )
 
 # --------------------------------------------------------------------------- 4 model & honesty
 with tab_model:
     st.subheader("What the model is, and what it is not")
+    st.caption(
+        "**How to read this tab.** Everything to know before trusting a number: what the model uses, why the "
+        "vetting flags are off-limits, whether its probabilities mean what they say, and the test that "
+        "matters most — did the 2020 version predict what the archive decided later?"
+    )
     cv = metrics["cv_macro_f1_physics_only"]
     cvf = metrics.get("cv_macro_f1_with_flags")
     oot = metrics["out_of_time"]
@@ -682,7 +863,7 @@ moderately, because confirmation is a follow-up-and-statistics process rather th
                 z=conf_m,
                 x=[f"rule: {c}" for c in classes],
                 y=[f"true: {c}" for c in classes],
-                colorscale="YlOrBr",
+                colorscale=T["sequential"],
                 text=conf_m,
                 texttemplate="%{text:,}",
                 showscale=False,
@@ -691,7 +872,7 @@ moderately, because confirmation is a follow-up-and-statistics process rather th
         )
         heat.update_layout(title="Out-of-fold confusion matrix of the rule (threshold 0.5)")
         heat.update_yaxes(autorange="reversed")
-        st.plotly_chart(style(heat, 380), width="stretch")
+        st.plotly_chart(style(heat, 380), width="stretch", theme=None)
         per = metrics["rule_per_class_f1"]
         st.markdown(
             "Per-class f1: " + ", ".join(f"**{c}** {per[c]:.2f}" for c in CLASS_ORDER) + "."
@@ -704,7 +885,7 @@ moderately, because confirmation is a follow-up-and-statistics process rather th
                 x=[0, 1],
                 y=[0, 1],
                 mode="lines",
-                line={"color": GRID, "width": 2, "dash": "dot"},
+                line={"color": T["text_secondary"], "width": 2, "dash": "dot"},
                 name="perfect calibration",
                 hoverinfo="skip",
             )
@@ -726,7 +907,7 @@ moderately, because confirmation is a follow-up-and-statistics process rather th
             xaxis={"title": "mean predicted probability", "range": [0, 1]},
             yaxis={"title": "fraction that are planets", "range": [0, 1]},
         )
-        st.plotly_chart(style(relfig, 380), width="stretch")
+        st.plotly_chart(style(relfig, 380), width="stretch", theme=None)
         cal = metrics["calibration"]
         st.markdown(
             f"Calibration lowers log loss {cal['log_loss_uncalibrated']:.3f} → "
@@ -790,7 +971,7 @@ moderately, because confirmation is a follow-up-and-statistics process rather th
         title="What the 2020-trained model thought of the 2020 candidates, split by what happened next",
     )
     oot_fig.update_yaxes(title="share of the group (%)")
-    st.plotly_chart(style(oot_fig, 380), width="stretch")
+    st.plotly_chart(style(oot_fig, 380), width="stretch", theme=None)
 
     tr = summary["transitions"]
     trm = pd.DataFrame(
@@ -808,6 +989,10 @@ moderately, because confirmation is a follow-up-and-statistics process rather th
 # --------------------------------------------------------------------------- 5 about
 with tab_about:
     st.subheader("Provenance, method, credits")
+    st.caption(
+        "**How to read this tab.** Where the data came from, how the app is built, the papers behind the "
+        "habitable-zone rules, and a glossary of the jargon used elsewhere in the app."
+    )
     snap_src = summary["sources"]["snapshot"]
     st.markdown(
         f"""
@@ -840,4 +1025,70 @@ and this app. Code, notebooks and the research log: [{REPO.replace("https://", "
 *This is an educational analysis of public data, not a product of NASA or the Exoplanet Archive.
 Verdicts are the archive's; probabilities are ours.*
 """
+    )
+
+    st.markdown("#### Glossary")
+    glossary = [
+        (
+            "Transit",
+            "A planet passing in front of its star, dimming it slightly and regularly. Kepler found planets by watching for these dips.",
+        ),
+        (
+            "KOI",
+            "Kepler Object of Interest: a repeating dip promising enough to track. Ids look like K00752.01 (star 752, first signal).",
+        ),
+        (
+            "CONFIRMED / CANDIDATE / FALSE POSITIVE",
+            "The archive's verdict: an established planet / still plausible but unsettled / not a planet (eclipsing stars, a neighbour's light, noise).",
+        ),
+        (
+            "Vetting flags",
+            "Four yes/no reasons the Kepler pipeline recorded when it rejected a signal. They are written by the same process that produces the verdict, so the model is not allowed to see them (target leakage).",
+        ),
+        (
+            "Insolation",
+            "Starlight received by the planet, compared with Earth (Earth = 1). The habitable-zone limits are defined on this number, not on distance.",
+        ),
+        (
+            "Habitable zone (conservative / optimistic)",
+            "The band of orbits where a rocky planet could keep liquid water. Conservative = runaway greenhouse to maximum greenhouse; optimistic = recent Venus to early Mars (Kopparapu et al. 2014). Hotter stars push it outward.",
+        ),
+        (
+            "Earth radii (R⊕)",
+            "Planet size compared with Earth. Below about 1.6 most planets are rocky; above 2 most have thick gas envelopes (Rogers 2015).",
+        ),
+        (
+            "Signal-to-noise (SNR)",
+            "How clearly the dip stands out from the noise in the star's brightness. Higher is a cleaner detection.",
+        ),
+        (
+            "Calibrated probability",
+            "A probability that means what it says: things rated 70% happen about 70% of the time. Checked on the reliability chart.",
+        ),
+        (
+            "Out-of-fold",
+            "Scored by a model that did not see that KOI during training (the data is split into five folds; each fold is scored by a model trained on the other four).",
+        ),
+        (
+            "Macro f1",
+            "The average, over the three verdicts, of each verdict's f1 (the balance of precision and recall). 1.0 is perfect; guessing among three classes gives about 0.33. Treats the rare class as equal to the common one.",
+        ),
+        (
+            "AUC",
+            "The chance that a randomly chosen real planet gets a higher planet-like score than a randomly chosen false positive. 0.5 is a coin flip; 1.0 is perfect.",
+        ),
+        (
+            "Out-of-time test",
+            "Train on the 2020 verdicts only, then check the predictions against what the archive decided afterwards — the closest thing to a real forecast.",
+        ),
+        (
+            "Kepler pipeline verdict vs archive verdict",
+            "Two different columns: the automated pipeline's two-way call from Kepler data alone, and the archive's three-way verdict that adds follow-up observations and published confirmations. The app predicts the archive's.",
+        ),
+    ]
+    st.dataframe(
+        pd.DataFrame(glossary, columns=["term", "meaning"]),
+        width="stretch",
+        hide_index=True,
+        height=540,
     )

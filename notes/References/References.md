@@ -23,6 +23,8 @@ One line each: what it is and what we use it for. "Verified" means the link was 
 - Mullally, F. et al. 2018, *Kepler's Earth-like Planets Should Not Be Confirmed without Independent Detection: The Case of Kepler-452b*, AJ 155, 210 — [arXiv:1803.11307](https://arxiv.org/abs/1803.11307) — quoted in the app's Kepler-452 b note. (Verified 2026-08-25)
 - Vanderburg, A. et al. 2020, *A Habitable-zone Earth-sized Planet Rescued from False Positive Status*, ApJL 893, L27 — [arXiv:2004.06725](https://arxiv.org/abs/2004.06725) — Kepler-1649 c; quoted in the app. (Verified 2026-08-25)
 
+- Angelo, I. et al. 2017, *Kepler-1649b: An Exo-Venus in the Solar Neighborhood*, AJ 153, 162 — [arXiv:1704.03136](https://arxiv.org/abs/1704.03136) — "receives incident flux at a level similar to that of Venus"; the KOI table's DR25 parameters put it inside the zone instead. Quoted in the app's habitable-zone caveat. (Verified 2026-08-25)
+
 ## Project history
 
 - [Rander417/KeplerExoplanet](https://github.com/Rander417/KeplerExoplanet) — this repo (Rich's fork). (Verified 2026-08-24)
@@ -33,6 +35,7 @@ One line each: what it is and what we use it for. "Verified" means the link was 
 
 - [uv installation](https://docs.astral.sh/uv/getting-started/installation/) — the Windows one-liner in `CLAUDE.md`.
 - [whitphx/stlite](https://github.com/whitphx/stlite) — Streamlit in the browser on Pyodide; `@stlite/browser` 1.8.1 bundles Streamlit 1.57.0 and loads Pyodide 0.29.3 (read from the npm package, 2026-08-25). The README's `mount()` options (`entrypoint`, `files` with `url`, `requirements`, `streamlitConfig`, `pyodideUrl`) are what `app/index.html` uses. (Verified 2026-08-25)
+- [Streamlit config.toml reference](https://docs.streamlit.io/develop/api-reference/configuration/config.toml) — "To define switchable light and dark themes, the configuration options in the `[theme]` table can be used in separate `[theme.dark]` and `[theme.light]` tables"; `base`, `baseFontSize`, `fontFaces` and a few others may not. (Verified 2026-08-25)
 - [Streamlit Community Cloud: app dependencies](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies) — "Community Cloud will search the directory where your entrypoint file is, then it will search the root of your repository"; precedence `uv.lock` > `Pipfile` > `environment.yml` > `requirements.txt` > `pyproject.toml`. (Verified 2026-08-25)
 - [GitHub Pages: configuring a publishing source](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) and the [community discussion on the `github-pages` environment rule](https://github.com/orgs/community/discussions/39054) — why a non-default branch must be allowed explicitly. (Verified 2026-08-25)
 - [Pyodide 0.29.3 release](https://github.com/pyodide/pyodide/releases/tag/0.29.3) — the distribution used for the local browser test (Python 3.13, numpy 2.2.5, pandas 2.3.3). (Downloaded 2026-08-25)

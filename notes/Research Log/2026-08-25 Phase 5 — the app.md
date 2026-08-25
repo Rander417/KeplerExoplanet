@@ -56,3 +56,12 @@ Then the workflow `.github/workflows/pages.yml` publishes on every push that tou
 - `app/app.py`, `app/index.html`, `app/build_site.py`, `app/requirements.txt`, `app/data/*`, `app/model/*`
 - `.streamlit/config.toml`, `run_app.cmd`, `.github/workflows/pages.yml`, `tests/test_app.py` (5 tests incl. Streamlit `AppTest` and a quick end-to-end bundle build)
 - README rewritten; the 2020 text moved to `archive/README_2020.md`
+
+## Batch #11 — dark mode and the layperson layer (same day)
+
+Rich's first-run feedback: the launcher works; he wants dark mode and plain-language context.
+
+- **Dark mode.** `.streamlit/config.toml` now defines paired `[theme.light]` / `[theme.dark]` tables (Streamlit follows the visitor's system setting; the ⋮ → Settings menu overrides), and `app/index.html` passes the same keys (`theme.dark.*`) to stlite. Verified in both Streamlit 1.62 (local) and 1.57 (stlite) — the keys exist in both `config.py`s. The charts read `st.context.theme.type` and pick a colour set from `kepler.palette.THEMES`; plotly is told `theme=None` so our surfaces win. The dark set keeps the three hues re-stepped for the dark surface `#15140f` and was validated with the dataviz checker (all pairs): CVD ΔE 8.6, normal-vision 23.5, every colour ≥ 3:1 — CONFIRMED `#1f7a1f`, CANDIDATE `#cc8016`, FALSE POSITIVE `#b8489a`. Lighter greens/ambers failed the dark lightness band or the protan separation, which is why the amber is *darker* in dark mode.
+- **Layperson layer.** A "Start here" expander (5 bullets: what Kepler did, what a KOI is, the three verdicts, what the model does and does not, how to read a probability); a one-line "how to read this tab" under every tab title; `?` tooltips on every filter, metric and what-if slider; a "what it means" column in the physics table; a 14-term glossary on the About tab. Streamlit's `st.info` box is blue, so notes use bordered containers instead.
+- **Small fixes:** bold chart titles, one tick per decade on log axes, explicit insolation ticks on the reversed HZ axis, "—" for unnamed KOIs, and the Kepler-1649 caveat now covers both planets: 1649 b tops the conservative-zone list on the table's DR25 parameters although [Angelo et al. 2017](https://arxiv.org/abs/1704.03136) describe it as an exo-Venus that "receives incident flux at a level similar to that of Venus". The lists are a screen, not a verdict.
+- Verified headless in both colour schemes, locally and in the stlite build: 10/10 tab renders, 0 exceptions. 41 tests.

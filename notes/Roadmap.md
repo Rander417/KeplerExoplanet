@@ -65,5 +65,6 @@ Agreed 2026-08-24 (see [decision](Decisions/2026-08-24%20Restart,%20layout,%20an
 - [ ] Rich: approve the two one-time Pages settings (source = GitHub Actions; allow `refresh-2026` in the `github-pages` environment) → Claude Code applies them → README placeholder becomes the live link
 - [ ] Optional: Rich deploys to Streamlit Community Cloud from his account (entrypoint `app/app.py`; `app/requirements.txt` is in place)
 - [x] README rewritten (2020 text preserved in `archive/README_2020.md`)
+- [x] Dark mode (paired themes, validated dark palette) and the layperson layer (Start-here panel, per-tab guides, tooltips, glossary) — Rich's first-run feedback, done 2026-08-25
 - [ ] Refresh the presentation
 - [ ] Stretch: run the same pipeline on the TESS Objects of Interest (TOI) table

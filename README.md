@@ -12,6 +12,8 @@ The app runs entirely on your machine — Python compiled to WebAssembly ([stlit
 
 Five tabs: **Catalogue** (filter, plot, download), **KOI explorer** (one object, the model's calibrated probabilities, what-if sliders), **Habitable zone** (Kopparapu limits with the small confirmed planets and candidates), **Model & honesty** (leakage, calibration, the out-of-time test), **About** (provenance).
 
+**Slides:** [`reports/presentation/Kepler_Refresh_2026.pdf`](reports/presentation/Kepler_Refresh_2026.pdf) (15 slides, the refresh next to the 2020 claims); the 2020 deck sits beside it.
+
 ![The out-of-time test: the 2020-trained model's view of the 2020 candidates, split by what the archive decided later](reports/figures/live/out_of_time_candidates.png)
 
 ## What we found (2026 refresh)

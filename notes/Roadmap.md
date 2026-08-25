@@ -66,5 +66,5 @@ Agreed 2026-08-24 (see [decision](Decisions/2026-08-24%20Restart,%20layout,%20an
 - [ ] Optional: Rich deploys to Streamlit Community Cloud from his account (entrypoint `app/app.py`; `app/requirements.txt` is in place)
 - [x] README rewritten (2020 text preserved in `archive/README_2020.md`)
 - [x] Dark mode (paired themes, validated dark palette) and the layperson layer (Start-here panel, per-tab guides, tooltips, glossary) — Rich's first-run feedback, done 2026-08-25
-- [ ] Refresh the presentation
+- [x] Refresh the presentation — `reports/presentation/Kepler_Refresh_2026.pptx` (+ `.pdf`, `build_deck.js`), 2026-08-25: [research log](Research%20Log/2026-08-25%20The%202026%20deck.md)
 - [ ] Stretch: run the same pipeline on the TESS Objects of Interest (TOI) table

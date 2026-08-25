@@ -20,7 +20,7 @@ notebooks/         01_cleaning_eda  02_clustering  03_sklearn_models  04_neural_
 src/kepler/        shared code: paths, data (load + column names), preprocess (clean, feature sets), models (2020 baselines, scoring, CV, NaN-native boosting, nested CV, calibration), clustering, habitable (Kopparapu limits, screen), fetch (live TAP pull), portable (numpy copy of the boosting model), verdict (the label rule), app_bundle (builds app/data + app/model), palette (colours, no plotting imports), viz (matplotlib style)
 models/            trained artifacts (ignored)
 notes/             Obsidian notes (the vault root is the repo root)
-reports/           figures/<topic>/ (2020 figures kept under *_2020/), tables/, presentation/
+reports/           figures/<topic>/ (2020 figures kept under *_2020/; app/ = screenshots for the deck), tables/, presentation/ (2020 deck + Kepler_Refresh_2026.pptx/.pdf + build_deck.js)
 archive/           2020 SQL schema + ERD (no credentials; the DB is retired for good), Flask web app, keras-tuner summaries, requirements_2020.txt, README_2020.md
 run_app.cmd        double-click launcher for the app (uv run streamlit run app/app.py)
 ```

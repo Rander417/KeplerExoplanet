@@ -26,6 +26,7 @@ The vault root is the git repo, so code, data docs, and notes all link to each o
   - [2026-08-24 Tag team, git autonomy, and how the app ships](Decisions/2026-08-24%20Tag%20team,%20git%20autonomy,%20and%20how%20the%20app%20ships.md)
   - [2026-08-24 Restart, layout, and tooling](Decisions/2026-08-24%20Restart,%20layout,%20and%20tooling.md)
 - **Research Log** — findings with numbers, one note per session or experiment
+  - [2026-08-25 The 2026 deck](Research%20Log/2026-08-25%20The%202026%20deck.md) — 15 slides, then-vs-now, every number sourced
   - [2026-08-25 Phase 5 — the app](Research%20Log/2026-08-25%20Phase%205%20—%20the%20app.md) — bundle numbers (with-flags 0.901 on live labels), browser verification, what Rich must approve
   - [2026-08-25 Notebook 08 — live archive vs snapshot](Research%20Log/2026-08-25%20Notebook%2008%20—%20live%20archive%20vs%20snapshot.md) — 925 verdicts changed; out-of-time AUC 0.937; flags rewritten with labels
   - [2026-08-24 Notebook 07 — models v2 and the live-data fetcher](Research%20Log/2026-08-24%20Notebook%2007%20—%20models%20v2%20and%20the%20live-data%20fetcher.md) — all rows, nested CV, calibration; physics-only ceiling ≈ 0.72

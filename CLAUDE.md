@@ -15,10 +15,10 @@ data/raw/          source files as downloaded (tracked)      data/README.md = pr
 data/processed/    regenerable parquet (ignored)
 data/legacy/       2020 pickles, kept for regression checks
 notebooks/         01_cleaning_eda  02_clustering  03_sklearn_models  04_neural_net  05_habitable_zone
-src/kepler/        shared code: paths, data (load + column names), preprocess (clean, feature sets), models (2020 baselines, scoring, CV), viz (palette); habitable later
+src/kepler/        shared code: paths, data (load + column names), preprocess (clean, feature sets), models (2020 baselines, scoring, CV), clustering (sweep + agreement), habitable (Kopparapu limits, screen), viz (palette)
 models/            trained artifacts (ignored)
 notes/             Obsidian notes (the vault root is the repo root)
-reports/           figures/ and presentation/
+reports/           figures/<topic>/ (2020 figures kept under *_2020/), tables/, presentation/
 archive/           2020 SQL schema + ERD (no credentials; the DB is retired for good), Flask web app, keras-tuner summaries, requirements_2020.txt
 ```
 
@@ -29,7 +29,7 @@ archive/           2020 SQL schema + ERD (no credentials; the DB is retired for 
 * Run things inside it: `uv run jupyter lab`, `uv run python script.py`, `uv run ruff check src tests`, `uv run pytest`.
 * Python 3.12 is pinned in `.python-version`; uv downloads it if missing.
 * PyTorch is added in Phase 4 as an optional extra (`uv sync --extra nn`). Its CUDA index is unreachable from the Cowork sandboxes, so that step runs on Rich's machine.
-* Notebooks 01 and 03 are rewritten on the package (2026-08-24). Notebooks 02, 04 and 05 still contain 2020 paths (`./Resources/...`, `Pickles/...`) and will not run until their Phase 2 rewrite.
+* Notebooks 01, 02, 03 and 05 are rewritten on the package (2026-08-24) and run top to bottom. Notebook 04 is the 2020 original (legacy paths) until its Phase 4 PyTorch rebuild.
 * No external databases: data lives in `data/raw/` (tracked) and `data/processed/` (regenerated); Phase 3 pulls from the archive's TAP service.
 
 ### First-time setup on a new machine (Claude Code does this; Rich watches)
@@ -37,7 +37,7 @@ archive/           2020 SQL schema + ERD (no credentials; the DB is retired for 
 1. Confirm `git --version` works and `git config user.name` / `user.email` are set.
 2. Install uv with the one-liner above, then open a new terminal so `uv` is on PATH.
 3. In the repo root: `uv sync --group dev` (downloads Python 3.12 the first time; a few minutes).
-4. `uv run pytest` — all tests must pass (16 as of 2026-08-24). `uv run ruff check src tests` must be clean.
+4. `uv run pytest` — all tests must pass (24 as of 2026-08-24). `uv run ruff check src tests` must be clean.
 5. VS Code: install the `ms-python.python` and `ms-toolsai.jupyter` extensions (`code --install-extension <id>`), open the repo folder, and pick `.venv\Scripts\python.exe` as the interpreter/kernel.
 6. Push whatever is unpushed on `refresh-2026` (see git autonomy below).
 
@@ -67,7 +67,7 @@ Rich runs the results, he does not build them. Every phase ends with something h
 ## Science guardrails (read before modelling)
 
 * **Target leakage.** The four `koi_fpflag_*` columns nearly determine `koi_pdisposition` (98% agreement measured on the Kaggle snapshot) and hand any model the FALSE POSITIVE class. Report two model variants: *with flags* (reproduces the vetting logic) and *physics-only* (no flags, no `koi_score`). Never quote a single f1 without saying which variant.
-* **Habitable zone.** Use insolation-based limits (Kopparapu et al. 2013 and its updates) on `koi_insol` with stellar-temperature dependence, plus a planet-radius ceiling for "plausibly rocky". Period/Teff/radius/logg/metallicity box filters are the *2020* heuristic, kept only for comparison.
+* **Habitable zone.** `kepler.habitable` implements the Kopparapu et al. 2014 stellar-temperature-dependent insolation limits on `koi_insol` plus the Rogers 2015 radius ceiling (1.6 R⊕; 2.0 as the loose cut); all host stars are in scope with a `sunlike_host` flag. The 2020 period/Teff/radius/metallicity box is kept only as `legacy_2020_box` for comparison.
 * **Data provenance.** Every table has a dated origin recorded in `data/README.md`. Live pulls are named `cumulative_tap_YYYY-MM-DD.csv`. The 2020 Kaggle snapshot stays in `data/raw/` for reproducibility.
 * **Two Ys.** `koi_pdisposition` (Kepler pipeline verdict, 2 classes) vs `koi_disposition` (archive verdict, 3 classes). The project's target is `koi_disposition`; say so explicitly in every model notebook.
 

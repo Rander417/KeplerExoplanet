@@ -4,7 +4,7 @@ Analysis of the NASA Exoplanet Archive's **Kepler Objects of Interest (KOI) cumu
 
 ## ▶ Run the app
 
-**In your browser, nothing to install:** [PLACEHOLDER — the link goes live once GitHub Pages is enabled: `https://rander417.github.io/KeplerExoplanet/`]
+**In your browser, nothing to install:** **[rander417.github.io/KeplerExoplanet](https://rander417.github.io/KeplerExoplanet/)**
 
 The app runs entirely on your machine — Python compiled to WebAssembly ([stlite](https://github.com/whitphx/stlite)) served as static files from this repository, so there is no server, no account, and nothing downloaded to disk. The first visit fetches about 30 MB and takes around a minute; later visits are faster.
 

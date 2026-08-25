@@ -1,0 +1,13 @@
+{
+  "source": "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select%20*%20from%20cumulative&format=csv",
+  "table": "cumulative",
+  "pulled_at_utc": "2026-08-25T18:30:33+00:00",
+  "rows": 9564,
+  "columns": 153,
+  "sha256": "37fffa141e05a4fba2a616ee8213631f8859e8770cd6137abfa5122f17c2ac5b",
+  "koi_disposition_counts": {
+    "FALSE POSITIVE": 4839,
+    "CONFIRMED": 2748,
+    "CANDIDATE": 1977
+  }
+}
